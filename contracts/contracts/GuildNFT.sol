@@ -56,6 +56,11 @@ contract GuildNFT is Initializable,
         _;
     }
 
+    modifier onlyMember(address wallet) {
+        require(balanceOf(wallet) > 0, "GuildNFT: not a member");
+        _;
+    }
+
     //FUNCTIONS
 
     function mintMember(address to, string memory uri) external onlyOwner notAlreadyMember(to){
@@ -71,10 +76,17 @@ contract GuildNFT is Initializable,
         return balanceOf(wallet) > 0;
     }
 
-    function upgradeMember(uint256 tokenId, Role newRole) external onlyOwner
+    function upgradeMember(address member, Role newRole) external onlyOwner onlyMember(member)
     {
-        _memberRoles[tokenId] = newRole;
-        emit MemberUpgraded(tokenId, newRole);
+        uint256 _tokenId = _ownerTokenId[member];
+        _memberRoles[_tokenId] = newRole;
+        emit MemberUpgraded(_tokenId, newRole);
+    }
+
+
+    function getRoleByWallet(address wallet) external view returns (Role) {
+        uint256 tokenId = _ownerTokenId[wallet];
+        return _memberRoles[tokenId];
     }
 
     function getRole(uint256 tokenId) external view returns (Role) {

@@ -50,7 +50,7 @@ describe("GuildNFT contract config", function () {
   });
 });
 
-describe("GuildNFT management members", function () {
+describe("GuildNFT creation member and retrieve nft", function () {
   beforeEach(async function () {
     ({ guild, owner, otherAccount } = await initContract());
   });
@@ -60,12 +60,68 @@ describe("GuildNFT management members", function () {
     expect(resultIsMember).to.equal(false);
   });
 
-  it("should mint a nft for a member", async () => {
+  it("should mint a nft for a future member", async () => {
     await expect(guild.mintMember(otherAccount, "ipfs://test"))
       .to.emit(guild, "MemberMinted")
       .withArgs(otherAccount.address, 1);
 
     expect(await guild.isMember(otherAccount.address)).to.equal(true);
-    expect(await guild.getRole(1)).to.equal(0);
+  });
+
+  it("should mint a nft for a future member", async () => {
+    await guild.mintMember(otherAccount, "ipfs://test");
+    expect(await guild.isMember(otherAccount.address)).to.equal(true);
+
+    const tokenURI = await guild.tokenURI(1);
+    console.log("URI", tokenURI);
+
+    expect(tokenURI).to.equal("ipfs://test");
+  });
+
+  it("shoud create a member by minting and get back the token URI by the address wallet", async () => {
+    await guild.mintMember(otherAccount, "ipfs://test");
+    expect(await guild.isMember(otherAccount.address)).to.equal(true);
+
+    const URI = await guild.getMemberURI(otherAccount);
+    expect(URI).to.equal("ipfs://test");
+  });
+
+  describe("GuildNFT management member and find role", function () {
+    beforeEach(async function () {
+      ({ guild, owner, otherAccount } = await initContract());
+    });
+
+    it("should create a member and give him a member role", async () => {
+      await expect(guild.mintMember(otherAccount, "ipfs://test"))
+        .to.emit(guild, "MemberMinted")
+        .withArgs(otherAccount.address, 1);
+
+      expect(await guild.isMember(otherAccount.address)).to.equal(true);
+      expect(await guild.getRole(1)).to.equal(0);
+    });
+
+    it("should create a member and give him a member role and upgrade to senior", async () => {
+      await guild.mintMember(otherAccount, "ipfs://test");
+
+      expect(await guild.isMember(otherAccount.address)).to.equal(true);
+      expect(await guild.getRole(1)).to.equal(0);
+
+      await expect(guild.upgradeMember(otherAccount, 1))
+        .to.emit(guild, "MemberUpgraded")
+        .withArgs(1, 1);
+      expect(await guild.getRole(1)).to.equal(1);
+    });
+
+    it("should retrieve the role of a member by the address", async () => {
+      let memberRole;
+
+      await guild.mintMember(otherAccount, "ipfs://test");
+      memberRole = await guild.getRoleByWallet(otherAccount);
+      expect(memberRole).to.equal(0);
+
+      await guild.upgradeMember(otherAccount, 1);
+      memberRole = await guild.getRoleByWallet(otherAccount);
+      expect(memberRole).to.equal(1);
+    });
   });
 });
