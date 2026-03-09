@@ -132,42 +132,57 @@ describe("GuildNFT creation member and retrieve nft", function () {
     expect(members[1]).to.equal(otherAccount3.address);
   });
 
+  it("should disable not add a member if the guild is deactivate", async () => {
+    await guild.createGuild("guild Test");
+    await guild.mintMember(otherAccount.address, "ipfs://test", 1);
+
+    await guild.disableGuild(1);
+
+    await expect(
+      guild.mintMember(otherAccount2.address, "ipfs://test", 1),
+    ).to.be.revertedWith("GuildNFT: guild does not exist");
+  });
+
   describe("GuildNFT management member and find role", function () {
     beforeEach(async function () {
       ({ guild, owner, otherAccount } = await initContract());
     });
 
-    // it("should create a member and give him a member role", async () => {
-    //   await expect(guild.mintMember(otherAccount, "ipfs://test"))
-    //     .to.emit(guild, "MemberMinted")
-    //     .withArgs(otherAccount.address, 1);
+    it("should create a member and give him a member role", async () => {
+      await guild.createGuild("guild Test");
+      await expect(guild.mintMember(otherAccount, "ipfs://test", 1))
+        .to.emit(guild, "MemberMinted")
+        .withArgs(otherAccount.address, 1, 1);
 
-    //   expect(await guild.isMember(otherAccount.address)).to.equal(true);
-    //   expect(await guild.getRole(1)).to.equal(0);
-    // });
+      expect(await guild.isMember(otherAccount.address)).to.equal(true);
+      expect(await guild.getRole(1)).to.equal(0);
+    });
 
-    // it("should create a member and give him a member role and upgrade to senior", async () => {
-    //   await guild.mintMember(otherAccount, "ipfs://test");
+    it("should create a member and give him a member role and upgrade to senior", async () => {
+      await guild.createGuild("guild Test");
+      await guild.mintMember(otherAccount, "ipfs://test", 1);
 
-    //   expect(await guild.isMember(otherAccount.address)).to.equal(true);
-    //   expect(await guild.getRole(1)).to.equal(0);
+      expect(await guild.isMember(otherAccount.address)).to.equal(true);
+      expect(await guild.getRole(1)).to.equal(0);
 
-    //   await expect(guild.upgradeMember(otherAccount, 1))
-    //     .to.emit(guild, "MemberUpgraded")
-    //     .withArgs(1, 1);
-    //   expect(await guild.getRole(1)).to.equal(1);
-    // });
+      await expect(guild.upgradeMember(otherAccount, 1))
+        .to.emit(guild, "MemberUpgraded")
+        .withArgs(1, 1);
+      expect(await guild.getRole(1)).to.equal(1);
+    });
 
-    // it("should retrieve the role of a member by the address", async () => {
-    //   let memberRole;
+    it("should retrieve the role of a member by the address", async () => {
+      let memberRole;
 
-    //   await guild.mintMember(otherAccount, "ipfs://test");
-    //   memberRole = await guild.getRoleByWallet(otherAccount);
-    //   expect(memberRole).to.equal(0);
+      await guild.createGuild("guild Test");
 
-    //   await guild.upgradeMember(otherAccount, 1);
-    //   memberRole = await guild.getRoleByWallet(otherAccount);
-    //   expect(memberRole).to.equal(1);
-    // });
+      await guild.mintMember(otherAccount, "ipfs://test", 1);
+      memberRole = await guild.getRoleByWallet(otherAccount);
+      expect(memberRole).to.equal(0);
+
+      await guild.upgradeMember(otherAccount, 1);
+      memberRole = await guild.getRoleByWallet(otherAccount);
+      expect(memberRole).to.equal(1);
+    });
   });
 });
