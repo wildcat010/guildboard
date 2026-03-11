@@ -1,7 +1,7 @@
 {
   "network": "sepolia",
-  "guildNFT": "0x818E98B5fF54Bfad0315615344f28CeD5AdA4c9B",
-  "guildboard": "0xe420907b474fc8a965D09Fa6B1764232Dcaf5F55",
-  "deployedAt": "2026-03-11T13:47:10.604Z",
+  "guildNFT": "0xda8F3022be979813fada09032fE9E73188C7323F",
+  "guildboard": "0x03Eb2348E4F984153FE729dA9A6be32c8FA3D7DF",
+  "deployedAt": "2026-03-11T14:05:59.596Z",
   "deployer": "0x603641AAFa4F250fb4B0CB4b9F078961487c367B"
 }
