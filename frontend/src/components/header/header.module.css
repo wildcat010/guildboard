@@ -84,8 +84,8 @@
   background: linear-gradient(135deg, #7a6030, #6a5020);
   box-shadow: 0 0 20px rgba(201, 168, 76, 0.2);
 }
-.connectBtn.connected {
-  background: linear-gradient(135deg, #0d2010, #0a1c0a);
-  border-color: #22c55e;
-  color: #22c55e;
+.connected {
+  background: linear-gradient(135deg, #0d2010, #0a1c0a) !important;
+  border-color: #22c55e !important;
+  color: #22c55e !important;
 }
