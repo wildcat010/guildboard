@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 28px;
+  align-items: flex-start;
 }
 
 .pageTitle {
@@ -44,4 +45,10 @@
 .btnPrimary:hover {
   box-shadow: 0 0 20px rgba(201, 168, 76, 0.25);
   background: linear-gradient(135deg, #7a6030, #6a5020);
+}
+
+.btnGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
