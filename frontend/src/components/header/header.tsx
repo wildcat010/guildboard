@@ -12,7 +12,6 @@ export default function Header() {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    debugger;
     const btn = document.getElementById("connectBtn");
     const text = document.getElementById("connectText");
     const icon = document.getElementById("connectIcon");

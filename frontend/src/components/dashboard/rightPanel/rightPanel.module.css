@@ -1,0 +1,63 @@
+.rightPanel {
+  border-left: 1px solid #c9a84c33;
+  padding: 24px 20px;
+  background: rgba(13, 16, 24, 0.5);
+  overflow-y: auto;
+}
+
+.panelTitle {
+  font-family: "Cinzel", serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #c9a84c;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panelTitle::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #c9a84c33;
+}
+
+.memberListItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+.memberListItem:hover {
+  border-color: #c9a84c;
+  background: rgba(201, 168, 76, 0.04);
+}
+
+.memberInfo {
+  flex: 1;
+  min-width: 0;
+}
+.memberListName {
+  font-weight: 700;
+  font-size: 13px;
+  color: #c8cdd8;
+  letter-spacing: 0.5px;
+}
+.memberListRole {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.memberEarn {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 12px;
+  color: #c9a84c;
+  text-align: right;
+}

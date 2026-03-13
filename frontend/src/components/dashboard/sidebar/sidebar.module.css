@@ -1,0 +1,104 @@
+.sidebar {
+  border-right: 1px solid #c9a84c33;
+  padding: 24px 0;
+  background: rgba(13, 16, 24, 0.5);
+}
+
+.sidebarSection {
+  padding: 0 16px 24px;
+  border-bottom: 1px solid #c9a84c33;
+  margin-bottom: 16px;
+}
+
+.sidebarLabel {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 10px;
+  color: #7a6030;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.sidebarItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: 2px;
+}
+.sidebarItem:hover {
+  color: var(--text);
+  border-color: #c9a84c33;
+  background: rgba(201, 168, 76, 0.04);
+}
+.sidebarItem.active {
+  color: #c9a84c;
+  border-color: #c9a84c33;
+  background: rgba(201, 168, 76, 0.08);
+}
+.sidebarItem .icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.memberCard {
+  background: #111520;
+  border: 1px solid #c9a84c33;
+  padding: 16px;
+  margin: 0 16px;
+}
+
+.memberAvatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #7a6030, #e8570a);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.memberName {
+  font-family: "Cinzel", serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #f0d080;
+  margin-bottom: 4px;
+}
+
+.memberAddress {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 10px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.badge.gold {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: rgba(201, 168, 76, 0.3);
+  color: #c9a84c;
+}
