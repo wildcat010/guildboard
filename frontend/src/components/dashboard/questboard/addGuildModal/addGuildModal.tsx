@@ -1,6 +1,7 @@
 "use client";
 import styles from "./addGuildModal.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useManagementGuild } from "@/hooks/useManagementGuilds";
 
 type AddGuildModalProps = {
   onClose: () => void;
@@ -8,6 +9,17 @@ type AddGuildModalProps = {
 
 export default function AddGuildModal({ onClose }: AddGuildModalProps) {
   const [guildName, setGuildName] = useState("");
+
+  const { createGuild, isPending, isSuccess } = useManagementGuild();
+
+  function handleSubmit() {
+    if (isSuccess) {
+      onClose();
+      return;
+    }
+    if (!guildName.trim()) return;
+    createGuild(guildName);
+  }
 
   return (
     <>
@@ -25,6 +37,9 @@ export default function AddGuildModal({ onClose }: AddGuildModalProps) {
               onChange={(e) => setGuildName(e.target.value)}
             />
           </div>
+          <button onClick={() => handleSubmit} disabled={isPending}>
+            {isPending ? "Creating..." : "Create Guild"}
+          </button>
         </div>
       </div>
     </>
