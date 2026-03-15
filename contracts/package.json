@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost && cp deployments/localhost.json ../frontend/src/contracts/deployments.json",
+    "deploy:sepolia": "hardhat run scripts/deploy.ts --network sepolia && cp deployments/sepolia.json ../frontend/src/contracts/deployments.json"
   },
   "keywords": [],
   "author": "",
