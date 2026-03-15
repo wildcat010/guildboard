@@ -24,7 +24,7 @@ export default function GuildPanel({ guilds }: GuildPanelProps) {
             className={styles.miniHex}
             style={{ width: "32px", height: "32px", fontSize: "13px" }}
           >
-            {guild.name}.charAt(0).toUpperCase();
+            {guild.name.charAt(0).toUpperCase()}
           </div>
           <div className={styles.memberInfo}>
             <div className={styles.memberListName}>{guild.name}</div>

@@ -2,6 +2,7 @@
 import styles from "./addGuildModal.module.css";
 import { useState, useEffect } from "react";
 import { useManagementGuild } from "@/hooks/useManagementGuilds";
+import { useGuild } from "@/hooks/useGuild";
 
 type AddGuildModalProps = {
   onClose: () => void;
@@ -10,7 +11,16 @@ type AddGuildModalProps = {
 export default function AddGuildModal({ onClose }: AddGuildModalProps) {
   const [guildName, setGuildName] = useState("");
 
+  const { refetchGuilds } = useGuild();
+
   const { createGuild, isPending, isSuccess } = useManagementGuild();
+
+  useEffect(() => {
+    if (isSuccess) {
+      onClose();
+      refetchGuilds();
+    }
+  }, [isSuccess]);
 
   function handleSubmit() {
     if (isSuccess) {
@@ -37,9 +47,12 @@ export default function AddGuildModal({ onClose }: AddGuildModalProps) {
               onChange={(e) => setGuildName(e.target.value)}
             />
           </div>
-          <button onClick={() => handleSubmit} disabled={isPending}>
-            {isPending ? "Creating..." : "Create Guild"}
-          </button>
+          <div className={styles.modalFooter}>
+            <button onClick={onClose}>Cancel</button>
+            <button onClick={handleSubmit} disabled={isPending}>
+              {isPending ? "Creating..." : "Create Guild"}
+            </button>
+          </div>
         </div>
       </div>
     </>

@@ -24,7 +24,7 @@ export function useGuild() {
     args: [address],
   });
 
-  const { data: guilds } = useReadContract({
+  const { data: guilds, refetch: refetchGuilds } = useReadContract({
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "getAllGuilds",
@@ -39,5 +39,5 @@ export function useGuild() {
     query: { enabled: isOwner },
   });
 
-  return { isMember, guilds, role, isOwner };
+  return { isMember, guilds, role, isOwner, refetchGuilds };
 }

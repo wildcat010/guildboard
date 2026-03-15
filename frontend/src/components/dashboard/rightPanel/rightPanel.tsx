@@ -16,7 +16,7 @@ export default function Rightbar() {
   return (
     <div className={styles.rightPanel}>
       <div className={styles.panelTitle}>Guilds - {guildsArray.length}</div>
-      <GuildPanel guilds={guildsArray}></GuildPanel>
+      <GuildPanel guilds={guildsArray.slice(0, 5)}></GuildPanel>
     </div>
   );
 }

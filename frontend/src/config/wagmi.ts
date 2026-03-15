@@ -1,9 +1,9 @@
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { sepolia } from "wagmi/chains";
+import { hardhat, sepolia } from "wagmi/chains";
 
 export const config = getDefaultConfig({
   appName: "GuildBoard",
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
-  chains: [sepolia],
+  chains: [hardhat, sepolia],
   ssr: true,
 });
