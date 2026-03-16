@@ -9,14 +9,19 @@ import { Guild } from "./../../../constants/constants";
 import GuildPanel from "./guildPanel/guildPanel";
 
 export default function Rightbar() {
-  const { guilds } = useGuild();
-  const guildsArray = (guilds as Guild[]) ?? [];
+  const { guilds, guildCount, guildCountLimit, isOwner } = useGuild();
+  console.log("guildCount:", guildCount);
+  console.log("guildCountLimit:", guildCountLimit);
+  console.log("isOwner:", isOwner);
+
+  const count = (guildCount as bigint)?.toString() ?? "0";
+  const guildsArray = (guildCountLimit as Guild[]) ?? [];
   useEffect(() => {});
 
   return (
     <div className={styles.rightPanel}>
-      <div className={styles.panelTitle}>Guilds - {guildsArray.length}</div>
-      <GuildPanel guilds={guildsArray.slice(0, 5)}></GuildPanel>
+      <div className={styles.panelTitle}>Guilds - {count}</div>
+      <GuildPanel guilds={guildsArray}></GuildPanel>
     </div>
   );
 }

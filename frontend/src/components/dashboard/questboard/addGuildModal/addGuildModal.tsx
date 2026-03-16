@@ -11,7 +11,7 @@ type AddGuildModalProps = {
 export default function AddGuildModal({ onClose }: AddGuildModalProps) {
   const [guildName, setGuildName] = useState("");
 
-  const { refetchGuilds } = useGuild();
+  const { refetchGuilds, refetchGuildsCount, refetchGuildsLimit } = useGuild();
 
   const { createGuild, isPending, isSuccess } = useManagementGuild();
 
@@ -19,6 +19,8 @@ export default function AddGuildModal({ onClose }: AddGuildModalProps) {
     if (isSuccess) {
       onClose();
       refetchGuilds();
+      refetchGuildsCount();
+      refetchGuildsLimit();
     }
   }, [isSuccess]);
 

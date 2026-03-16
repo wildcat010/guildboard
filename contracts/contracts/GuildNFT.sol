@@ -113,6 +113,20 @@ contract GuildNFT is Initializable,
         return allGuilds;
     }
 
+    function getGuildCount() external view returns(uint256) {
+        return _guildCounter;
+    }
+
+    function getRecentGuilds(uint256 limit) external view returns (Guild[] memory) {
+        uint256 total = _guildCounter;
+        uint256 count = limit > total ? total : limit;
+        Guild[] memory recent = new Guild[](count);
+        for (uint256 i = 0; i < count; i++) {
+            recent[i] = _guilds[total - i]; 
+        }
+        return recent;
+    }
+
     function getGuildMembers(uint256 guildId) 
         external 
         view 
