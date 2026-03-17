@@ -31,16 +31,16 @@ export default function Sidebar({
           <span className="icon">📋</span> Quest Board
         </button>
         <button
+          className={`${styles.sidebarItem} ${activeSection === "guildMembers" ? styles.active : ""}`}
+          onClick={() => onSectionChange("guildMembers")}
+        >
+          <span className="icon">🏆</span> Guild Members
+        </button>
+        <button
           className={`${styles.sidebarItem} ${activeSection === "members" ? styles.active : ""}`}
           onClick={() => onSectionChange("members")}
         >
-          <span className="icon">👥</span> Guild Members
-        </button>
-        <button
-          className={`${styles.sidebarItem} ${activeSection === "leaderboard" ? styles.active : ""}`}
-          onClick={() => onSectionChange("leaderboard")}
-        >
-          <span className="icon">🏆</span> Leaderboard
+          <span className="icon">👥</span> Members
         </button>
         <button
           className={`${styles.sidebarItem} ${activeSection === "payments" ? styles.active : ""}`}

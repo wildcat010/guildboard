@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function useGuild(limit = 5) {
+export function useGuild(guildId = 0, limit = 5) {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
@@ -57,22 +57,25 @@ export function useGuild(limit = 5) {
       query: { enabled: isOwner },
     });
 
-  console.log("contractOwner:", contractOwner);
-  console.log("address:", address);
-  console.log("isOwner:", isOwner);
-  console.log("guilds:", guilds);
-  console.log("guildCount:", guildCount);
-  console.log("guildCountLimit:", guildCountLimit);
+  const { data: guildMembers, refetch: refetchGuildMembers } = useReadContract({
+    address: GUILD_NFT_ADDRESS,
+    abi: GUILD_NFT_ABI,
+    functionName: "getGuildMembers",
+    args: [BigInt(guildId ?? 0)],
+    query: { enabled: isOwner },
+  });
 
   return {
     isMember,
     guilds,
     guildCount,
     guildCountLimit,
+    guildMembers,
     role,
     isOwner,
     refetchGuilds,
     refetchGuildsCount,
     refetchGuildsLimit,
+    refetchGuildMembers,
   };
 }

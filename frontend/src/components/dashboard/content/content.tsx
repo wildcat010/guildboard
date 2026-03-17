@@ -9,6 +9,7 @@ import { Section } from "./../../../constants/constants";
 import Questboard from "./../../dashboard/questboard/questboard";
 import GuildMembers from "./../../dashboard/guildMembers/guildMembers";
 import Payments from "./../../dashboard/payments/payments";
+import Members from "./../../dashboard/members/members";
 
 type ContentProps = {
   activeSection: Section;
@@ -20,7 +21,8 @@ export default function Content({ activeSection }: ContentProps) {
   return (
     <div className={styles.content}>
       {activeSection === "questboard" && <Questboard />}
-      {activeSection === "members" && <GuildMembers />}
+      {activeSection === "guildMembers" && <GuildMembers />}
+      {activeSection === "members" && <Members />}
       {activeSection === "payments" && <Payments />}
     </div>
   );

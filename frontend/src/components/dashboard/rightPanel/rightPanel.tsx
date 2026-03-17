@@ -9,7 +9,7 @@ import { Guild } from "./../../../constants/constants";
 import GuildPanel from "./guildPanel/guildPanel";
 
 export default function Rightbar() {
-  const { guilds, guildCount, guildCountLimit, isOwner } = useGuild();
+  const { guildCount, guildCountLimit, isOwner } = useGuild();
   console.log("guildCount:", guildCount);
   console.log("guildCountLimit:", guildCountLimit);
   console.log("isOwner:", isOwner);

@@ -12,8 +12,8 @@ export type Guild = {
 
 export type Section =
   | "questboard"
+  | "guildMembers"
   | "members"
-  | "leaderboard"
   | "payments"
   | "mynft"
   | "settings";
