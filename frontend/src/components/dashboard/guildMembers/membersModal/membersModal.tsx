@@ -12,22 +12,30 @@ export default function MembersModal({ onClose }: MembersModalProps) {
   const [memberName, setMemberName] = useState("");
 
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2>Add Member</h2>
-          <button onClick={onClose}>✕</button>
+    <div className={styles.modalOverlay}>
+      <div className={styles.modal}>
+        <button className={styles.modalClose} onClick={onClose}>
+          ✕
+        </button>
+        <div className={styles.modalTitle}>⚔ Guild Card</div>
+
+        <div className="nft-check">
+          <div className="nft-icon">🛡</div>
+          <div className="nft-text">
+            <div className="nft-title">NFT Membership Verified</div>
+            <div className="nft-desc">
+              GuildBoard Member #042 · 0x7f3a...c8b1
+            </div>
+          </div>
+          <span className="badge">✓ Member</span>
         </div>
-        <div className={styles.modalBody}>
-          <label>Member Name</label>
-          <input type="text" onChange={(e) => setMemberName(e.target.value)} />
-        </div>
-        {/* <div className={styles.modalFooter}>
-            <button onClick={onClose}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isPending}>
-              {isPending ? "Creating..." : "Create Guild"}
-            </button>
-          </div> */}
+
+        <button
+          className="btn-primary"
+          style={{ width: "100%", padding: "12px" }}
+        >
+          ⟶ Deploy Quest On-Chain
+        </button>
       </div>
     </div>
   );

@@ -16,18 +16,27 @@ export default function GuildCard({ guildCard }: GuildCardProps) {
   const listMembers = (guildMembers as string[]) ?? [];
 
   return (
-    <div className={styles.taskCard}>
-      <div className={styles.taskTitle}>{guildCard.name}</div>
-      <div className={styles.taskSkills}>
-        <span className={styles.skillTag}>{listMembers.length}</span>
-      </div>
+    <>
+      <div
+        className={styles.taskCard}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowModal(true);
+        }}
+      >
+        <div className={styles.taskTitle}>{guildCard.name}</div>
+        <div className={styles.taskSkills}>
+          <span className={styles.skillTag}>{listMembers.length}</span>
+        </div>
 
-      <div className={styles.taskFooter}>
-        <div className={styles.taskReward}>
-          <div className={styles.ethIcon}></div>0.08 ETH
+        <div className={styles.taskFooter}>
+          <div className={styles.taskReward}></div>
+          <div
+            className={guildCard.active ? styles.dotActive : styles.dotInactive}
+          />
         </div>
       </div>
       {showModal && <MembersModal onClose={() => setShowModal(false)} />}
-    </div>
+    </>
   );
 }

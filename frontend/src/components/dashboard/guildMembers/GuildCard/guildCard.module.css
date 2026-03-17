@@ -45,13 +45,6 @@
   font-weight: 700;
 }
 
-.ethIcon {
-  width: 14px;
-  height: 14px;
-  background: linear-gradient(135deg, #627eea, #4169e1);
-  clip-path: polygon(50% 0%, 100% 40%, 50% 60%, 0% 40%);
-}
-
 .taskSkills {
   display: flex;
   gap: 4px;
@@ -68,4 +61,18 @@
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
+}
+
+.dotActive {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.dotInactive {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
 }

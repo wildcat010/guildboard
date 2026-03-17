@@ -17,10 +17,22 @@ export function useManagementGuild() {
     isConnected &&
     address?.toLowerCase() === (contractOwner as string)?.toLowerCase();
 
-  const { writeContract, isPending, isSuccess, isError } = useWriteContract();
+  const {
+    writeContract: writeGuild,
+    isPending: isGuildPending,
+    isSuccess: isGuildSuccess,
+    isError: isGuildError,
+  } = useWriteContract();
+
+  const {
+    writeContract: writeMember,
+    isPending: isMemberPending,
+    isSuccess: isMemberSuccess,
+    isError: isMemberError,
+  } = useWriteContract();
 
   function createGuild(name: string) {
-    writeContract({
+    writeGuild({
       address: GUILD_NFT_ADDRESS,
       abi: GUILD_NFT_ABI,
       functionName: "createGuild",
@@ -28,5 +40,28 @@ export function useManagementGuild() {
     });
   }
 
-  return { createGuild, isOwner, isPending, isSuccess, isError };
+  function mintMember(
+    addressMember: string,
+    tokenURI: string,
+    selectedGuildId: number,
+  ) {
+    writeMember({
+      address: GUILD_NFT_ADDRESS,
+      abi: GUILD_NFT_ABI,
+      functionName: "mintMember",
+      args: [addressMember as `0x${string}`, tokenURI, BigInt(selectedGuildId)],
+    });
+  }
+
+  return {
+    createGuild,
+    isGuildPending,
+    isGuildSuccess,
+    isGuildError,
+    mintMember,
+    isMemberPending,
+    isMemberSuccess,
+    isMemberError,
+    isOwner,
+  };
 }

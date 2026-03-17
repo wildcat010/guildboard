@@ -1,16 +1,14 @@
 "use client";
 
 import styles from "./guildMembers.module.css";
-import { useEffect, useState } from "react";
-import { Guild, Section } from "./../../../constants/constants";
-import AddMemberdModal from "./addMemberModal/addMemberModal";
+import { useState } from "react";
+import { Guild } from "./../../../constants/constants";
 import GuildCard from "./GuildCard/guildCard";
 import AddGuildModal from "./addGuildModal/addGuildModal";
 import { useGuild } from "@/hooks/useGuild";
 
 export default function AddMemberModal() {
   const [showModalCreateGuild, setShowModalCreateGuild] = useState(false);
-  const [showModalMember, setShowModalMember] = useState(false);
   const { guilds } = useGuild();
   const guildsArray = (guilds as Guild[]) ?? [];
 
@@ -35,14 +33,6 @@ export default function AddMemberModal() {
           >
             + Create Guild
           </button>
-          <button
-            className={styles.btnPrimary}
-            onClick={() => {
-              setShowModalMember(true);
-            }}
-          >
-            + Add Member to Guild
-          </button>
         </div>
       </div>
       <div className={styles.pageGuilds}>
@@ -53,9 +43,6 @@ export default function AddMemberModal() {
 
       {showModalCreateGuild && (
         <AddGuildModal onClose={() => setShowModalCreateGuild(false)} />
-      )}
-      {showModalMember && (
-        <AddMemberdModal onClose={() => setShowModalMember(false)} />
       )}
     </div>
   );
