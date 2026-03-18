@@ -1,0 +1,21 @@
+"use client";
+import { useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
+import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
+
+export function useGuildById(guildId: number) {
+  const { isConnected } = useAccount();
+
+  const { data: guildMembers, refetch: refetchGuildMembers } = useReadContract({
+    address: GUILD_NFT_ADDRESS,
+    abi: GUILD_NFT_ABI,
+    functionName: "getGuildMembers",
+    args: [BigInt(guildId ?? 0)],
+    query: { enabled: isConnected && guildId > 0 },
+  });
+
+  return {
+    guildMembers: (guildMembers as string[]) ?? [],
+    refetchGuildMembers,
+  };
+}

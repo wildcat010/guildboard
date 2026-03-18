@@ -2,8 +2,8 @@
 import { Guild } from "@/constants/constants";
 import styles from "./guildCard.module.css";
 import { useState } from "react";
-import { useGuild } from "@/hooks/useGuild";
 import MembersModal from "./../membersModal/membersModal";
+import { useGuildById } from "@/hooks/useGuildById";
 
 type GuildCardProps = {
   guildCard: Guild;
@@ -12,7 +12,7 @@ type GuildCardProps = {
 export default function GuildCard({ guildCard }: GuildCardProps) {
   const [showModal, setShowModal] = useState(false);
 
-  const { guildMembers } = useGuild(parseInt(guildCard.id.toString()));
+  const { guildMembers } = useGuildById(parseInt(guildCard.id.toString()));
   const listMembers = (guildMembers as string[]) ?? [];
 
   return (
@@ -36,7 +36,14 @@ export default function GuildCard({ guildCard }: GuildCardProps) {
           />
         </div>
       </div>
-      {showModal && <MembersModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <MembersModal
+          listMembers={listMembers}
+          active={guildCard.active}
+          guildCard={guildCard}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </>
   );
 }

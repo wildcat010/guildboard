@@ -13,19 +13,19 @@ export default function AddGuildModal({ onClose }: AddGuildModalProps) {
 
   const { refetchGuilds, refetchGuildsCount, refetchGuildsLimit } = useGuild();
 
-  const { createGuild, isPending, isSuccess } = useManagementGuild();
+  const { createGuild, isGuildPending, isGuildSuccess } = useManagementGuild();
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isGuildSuccess) {
       onClose();
       refetchGuilds();
       refetchGuildsCount();
       refetchGuildsLimit();
     }
-  }, [isSuccess]);
+  }, [isGuildSuccess]);
 
   function handleSubmit() {
-    if (isSuccess) {
+    if (isGuildSuccess) {
       onClose();
       return;
     }
@@ -51,8 +51,8 @@ export default function AddGuildModal({ onClose }: AddGuildModalProps) {
           </div>
           <div className={styles.modalFooter}>
             <button onClick={onClose}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isPending}>
-              {isPending ? "Creating..." : "Create Guild"}
+            <button onClick={handleSubmit} disabled={isGuildPending}>
+              {isGuildPending ? "Creating..." : "Create Guild"}
             </button>
           </div>
         </div>

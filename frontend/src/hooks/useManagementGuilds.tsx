@@ -4,19 +4,6 @@ import { useAccount } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 
 export function useManagementGuild() {
-  const { address, isConnected } = useAccount();
-
-  const { data: contractOwner } = useReadContract({
-    address: GUILD_NFT_ADDRESS,
-    abi: GUILD_NFT_ABI,
-    functionName: "owner",
-    query: { enabled: isConnected },
-  });
-
-  const isOwner =
-    isConnected &&
-    address?.toLowerCase() === (contractOwner as string)?.toLowerCase();
-
   const {
     writeContract: writeGuild,
     isPending: isGuildPending,
@@ -30,6 +17,31 @@ export function useManagementGuild() {
     isSuccess: isMemberSuccess,
     isError: isMemberError,
   } = useWriteContract();
+
+  const {
+    writeContract: writeStatusGuild,
+    isPending: isStatusGuildPending,
+    isSuccess: isStatusGuildSuccess,
+    isError: isStatusGuildError,
+  } = useWriteContract();
+
+  function enableStatus(guildId: number) {
+    writeStatusGuild({
+      address: GUILD_NFT_ADDRESS,
+      abi: GUILD_NFT_ABI,
+      functionName: "enableGuild",
+      args: [guildId],
+    });
+  }
+
+  function disableStatus(guildId: number) {
+    writeStatusGuild({
+      address: GUILD_NFT_ADDRESS,
+      abi: GUILD_NFT_ABI,
+      functionName: "disableGuild",
+      args: [guildId],
+    });
+  }
 
   function createGuild(name: string) {
     writeGuild({
@@ -62,6 +74,9 @@ export function useManagementGuild() {
     isMemberPending,
     isMemberSuccess,
     isMemberError,
-    isOwner,
+    enableStatus,
+    disableStatus,
+    isStatusGuildSuccess,
+    isStatusGuildPending,
   };
 }

@@ -1,15 +1,45 @@
 "use client";
 import { Guild } from "@/constants/constants";
 import styles from "./membersModal.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGuild } from "@/hooks/useGuild";
+import ListMember from "../ListMember/listMember";
+import { useManagementGuild } from "@/hooks/useManagementGuilds";
 
 type MembersModalProps = {
   onClose: () => void;
+  listMembers: string[];
+  active: boolean;
+  guildCard: Guild;
 };
 
-export default function MembersModal({ onClose }: MembersModalProps) {
+export default function MembersModal({
+  onClose,
+  listMembers,
+  active,
+  guildCard,
+}: MembersModalProps) {
   const [memberName, setMemberName] = useState("");
+  const [activeGuild, setActiveGuild] = useState(active);
+
+  const { enableStatus, disableStatus, isStatusGuildSuccess } =
+    useManagementGuild();
+
+  useEffect(() => {}, [activeGuild]);
+
+  const clickStatus = () => {
+    if (activeGuild) {
+      disableStatus(parseInt(guildCard.id.toString()));
+    } else {
+      enableStatus(parseInt(guildCard.id.toString()));
+    }
+  };
+
+  useEffect(() => {
+    if (isStatusGuildSuccess) {
+      setActiveGuild((prev) => !prev);
+    }
+  }, [isStatusGuildSuccess]);
 
   return (
     <div className={styles.modalOverlay}>
@@ -17,17 +47,17 @@ export default function MembersModal({ onClose }: MembersModalProps) {
         <button className={styles.modalClose} onClick={onClose}>
           ✕
         </button>
-        <div className={styles.modalTitle}>⚔ Guild Card</div>
+        <div className={styles.modalTitle}>⚔ Guild Card - {guildCard.name}</div>
 
-        <div className="nft-check">
-          <div className="nft-icon">🛡</div>
-          <div className="nft-text">
-            <div className="nft-title">NFT Membership Verified</div>
-            <div className="nft-desc">
-              GuildBoard Member #042 · 0x7f3a...c8b1
-            </div>
+        <div className={styles.formGroup}>
+          <span className={styles.formLabel}>
+            Users address - {listMembers.length}
+          </span>
+          <div>
+            {listMembers.map((member: string, i: number) => (
+              <ListMember addressMember={member}></ListMember>
+            ))}
           </div>
-          <span className="badge">✓ Member</span>
         </div>
 
         <button
@@ -36,6 +66,17 @@ export default function MembersModal({ onClose }: MembersModalProps) {
         >
           ⟶ Deploy Quest On-Chain
         </button>
+        <div className={styles.toggleContainer} onClick={clickStatus}>
+          <span className={styles.toggleLabel}>Status</span>
+          <button
+            className={`${styles.toggle} ${activeGuild ? styles.toggleActive : styles.toggleInactive}`}
+          >
+            <div className={styles.toggleThumb} />
+            <span className={styles.toggleText}>
+              {activeGuild ? "Active" : "Inactive"}
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

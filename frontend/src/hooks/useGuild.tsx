@@ -33,14 +33,6 @@ export function useGuild(guildId = 0, limit = 5) {
     query: { enabled: isOwner },
   });
 
-  const { data: role } = useReadContract({
-    address: GUILD_NFT_ADDRESS,
-    abi: GUILD_NFT_ABI,
-    functionName: "getRoleByWallet",
-    args: [address],
-    query: { enabled: isOwner },
-  });
-
   const { data: guildCount, refetch: refetchGuildsCount } = useReadContract({
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
@@ -71,7 +63,6 @@ export function useGuild(guildId = 0, limit = 5) {
     guildCount,
     guildCountLimit,
     guildMembers,
-    role,
     isOwner,
     refetchGuilds,
     refetchGuildsCount,

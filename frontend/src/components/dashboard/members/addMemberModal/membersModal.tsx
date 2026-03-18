@@ -59,6 +59,7 @@ export default function MembersModal({ onClose }: MembersModalProps) {
 
       const tokenURI = `ipfs://${metadataResult.cid}`;
       mintMember(addressMember, tokenURI, parseInt(selectedGuildId));
+      onClose();
     } catch (err) {
       console.error("Upload failed:", err);
     } finally {
@@ -122,8 +123,11 @@ export default function MembersModal({ onClose }: MembersModalProps) {
 
         <div className={styles.modalFooter}>
           <button onClick={onClose}>Cancel</button>
-          <button onClick={handleSubmit} disabled={isMemberPending}>
-            {isMemberPending ? "Creating..." : "Create Member"}
+          <button
+            onClick={handleSubmit}
+            disabled={isUploading && isMemberPending}
+          >
+            {isMemberPending && isUploading ? "Creating..." : "Create Member"}
           </button>
         </div>
       </div>
