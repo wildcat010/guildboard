@@ -9,7 +9,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 9999; /* ← very high */
 }
 .modalOverlay.open {
   opacity: 1;
@@ -21,8 +21,8 @@
   width: 480px;
   max-width: 90vw;
   padding: 32px;
-  position: relative;
-  transition: transform 0.3s;
+  position: relative; /* ← not fixed or absolute */
+  /* ← remove transform */
 }
 .modalOverlay.open .modal {
   transform: translateY(0);
@@ -63,6 +63,16 @@
   font-family: "Share Tech Mono", monospace;
   font-size: 11px;
   color: #c8cdd8;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.formLabelBig {
+  display: block;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 14px;
+  color: #fff;
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 6px;
@@ -139,4 +149,50 @@
 
 .toggleInactive .toggleText {
   color: #ef4444;
+}
+
+.button {
+  cursor: pointer;
+  background: #c9a84c0a;
+  border: 1px solid #c9a84c33;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 10px;
+  transition: all 0.2s;
+  display: flex;
+}
+
+.select {
+  width: 100%;
+  background: #0d0d0d;
+  border: 1px solid #c9a84c33;
+  padding: 10px 12px;
+  color: #fff;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23c9a84c' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.select:focus {
+  border-color: #c9a84c;
+}
+
+.select option {
+  background: #0d1018;
+  color: #fff;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }

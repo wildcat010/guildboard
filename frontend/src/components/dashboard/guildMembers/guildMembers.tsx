@@ -9,8 +9,19 @@ import { useGuild } from "@/hooks/useGuild";
 
 export default function AddMemberModal() {
   const [showModalCreateGuild, setShowModalCreateGuild] = useState(false);
-  const { guilds } = useGuild();
+
+  const { guilds, refetchGuilds, refetchGuildsCount, refetchGuildsLimit } =
+    useGuild();
+
   const guildsArray = (guilds as Guild[]) ?? [];
+
+  const handleOnSuccess = () => {
+    setTimeout(() => {
+      refetchGuilds();
+      refetchGuildsCount();
+      refetchGuildsLimit();
+    }, 500);
+  };
 
   return (
     <div className={styles.content}>
@@ -42,7 +53,10 @@ export default function AddMemberModal() {
       </div>
 
       {showModalCreateGuild && (
-        <AddGuildModal onClose={() => setShowModalCreateGuild(false)} />
+        <AddGuildModal
+          onClose={() => setShowModalCreateGuild(false)}
+          onSuccess={handleOnSuccess}
+        />
       )}
     </div>
   );

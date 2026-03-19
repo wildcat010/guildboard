@@ -21,6 +21,14 @@ const config: HardhatUserConfig = {
   networks: {
     localhost: {
       url: "http://127.0.0.1:8545",
+      allowUnlimitedContractSize: true,
+    },
+    hardhat: {
+      allowUnlimitedContractSize: true,
+      mining: {
+        auto: true,
+      },
+      gas: "auto",
     },
     sepolia: {
       url: SEPOLIA_RPC_URL,

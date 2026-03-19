@@ -6,21 +6,21 @@ import { useGuild } from "@/hooks/useGuild";
 
 type AddGuildModalProps = {
   onClose: () => void;
+  onSuccess: () => void;
 };
 
-export default function AddGuildModal({ onClose }: AddGuildModalProps) {
+export default function AddGuildModal({
+  onClose,
+  onSuccess,
+}: AddGuildModalProps) {
   const [guildName, setGuildName] = useState("");
-
-  const { refetchGuilds, refetchGuildsCount, refetchGuildsLimit } = useGuild();
 
   const { createGuild, isGuildPending, isGuildSuccess } = useManagementGuild();
 
   useEffect(() => {
     if (isGuildSuccess) {
       onClose();
-      refetchGuilds();
-      refetchGuildsCount();
-      refetchGuildsLimit();
+      onSuccess();
     }
   }, [isGuildSuccess]);
 

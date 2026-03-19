@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function useGuild(guildId = 0, limit = 5) {
+export function useGuild(limit = 5) {
   const { address, isConnected } = useAccount();
   const queryClient = useQueryClient();
 
@@ -12,7 +12,7 @@ export function useGuild(guildId = 0, limit = 5) {
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "owner",
-    query: { enabled: isConnected },
+    query: { enabled: isConnected, retry: false },
   });
 
   const isOwner =
@@ -24,20 +24,21 @@ export function useGuild(guildId = 0, limit = 5) {
     abi: GUILD_NFT_ABI,
     functionName: "isMember",
     args: [address],
+    query: { retry: false },
   });
 
   const { data: guilds, refetch: refetchGuilds } = useReadContract({
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "getAllGuilds",
-    query: { enabled: isOwner },
+    query: { enabled: isOwner, retry: false },
   });
 
   const { data: guildCount, refetch: refetchGuildsCount } = useReadContract({
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "getGuildCount",
-    query: { enabled: isOwner },
+    query: { enabled: isOwner, retry: false },
   });
 
   const { data: guildCountLimit, refetch: refetchGuildsLimit } =
@@ -46,27 +47,17 @@ export function useGuild(guildId = 0, limit = 5) {
       abi: GUILD_NFT_ABI,
       functionName: "getRecentGuilds",
       args: [BigInt(limit)],
-      query: { enabled: isOwner },
+      query: { enabled: isOwner, retry: false },
     });
-
-  const { data: guildMembers, refetch: refetchGuildMembers } = useReadContract({
-    address: GUILD_NFT_ADDRESS,
-    abi: GUILD_NFT_ABI,
-    functionName: "getGuildMembers",
-    args: [BigInt(guildId ?? 0)],
-    query: { enabled: isOwner },
-  });
 
   return {
     isMember,
     guilds,
     guildCount,
     guildCountLimit,
-    guildMembers,
     isOwner,
     refetchGuilds,
     refetchGuildsCount,
     refetchGuildsLimit,
-    refetchGuildMembers,
   };
 }

@@ -81,7 +81,7 @@ contract GuildNFT is Initializable,
     }
 
     modifier guildExists(uint256 guildId) {
-        require(_guilds[guildId].active, "GuildNFT: guild does not exist");
+        require(_guilds[guildId].id != 0, "GuildNFT: guild does not exist");
         _;
     }
 

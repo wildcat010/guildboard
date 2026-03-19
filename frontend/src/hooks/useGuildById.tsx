@@ -11,7 +11,12 @@ export function useGuildById(guildId: number) {
     abi: GUILD_NFT_ABI,
     functionName: "getGuildMembers",
     args: [BigInt(guildId ?? 0)],
-    query: { enabled: isConnected && guildId > 0 },
+    query: {
+      enabled: isConnected && guildId > 0,
+      retry: false,
+      retryOnMount: false,
+      gcTime: 0,
+    },
   });
 
   return {

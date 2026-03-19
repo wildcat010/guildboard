@@ -1,6 +1,5 @@
 "use client";
-import { useWriteContract, useReadContract } from "wagmi";
-import { useAccount } from "wagmi";
+import { useWriteContract } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 
 export function useManagementGuild() {
@@ -30,7 +29,7 @@ export function useManagementGuild() {
       address: GUILD_NFT_ADDRESS,
       abi: GUILD_NFT_ABI,
       functionName: "enableGuild",
-      args: [guildId],
+      args: [BigInt(guildId)],
     });
   }
 
@@ -39,7 +38,7 @@ export function useManagementGuild() {
       address: GUILD_NFT_ADDRESS,
       abi: GUILD_NFT_ABI,
       functionName: "disableGuild",
-      args: [guildId],
+      args: [BigInt(guildId)],
     });
   }
 

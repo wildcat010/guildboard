@@ -3,7 +3,7 @@
 import styles from "./questboard.module.css";
 import { useEffect, useState } from "react";
 import { Section } from "./../../../constants/constants";
-import AddGuildModal from "./addGuildModal/addGuildModal";
+
 import AddTaskModal from "./addTaskModal/addTaskModal";
 
 export default function Questboard() {
@@ -39,21 +39,10 @@ export default function Questboard() {
           >
             + Post Task
           </button>
-          <button
-            className={styles.btnPrimary}
-            onClick={() => {
-              setShowModalGuild(true);
-            }}
-          >
-            + Create Guild
-          </button>
         </div>
       </div>
       {showModalTask && (
         <AddTaskModal onClose={() => setShowModalTask(false)} />
-      )}
-      {showModalGuild && (
-        <AddGuildModal onClose={() => setShowModalGuild(false)} />
       )}
     </div>
   );
