@@ -76,71 +76,75 @@ describe("GuildNFT creation member and retrieve nft", function () {
   });
 
   it("should mint a nft for a future member guild", async () => {
-    await expect(guild.createGuild("guild Test"));
-    await expect(guild.mintMember(otherAccount, "ipfs://test", 1))
+    await guild.createGuild("guild Test");
+    await expect(guild.mintMember("Member", otherAccount, "ipfs://test", 1))
       .to.emit(guild, "MemberMinted")
-      .withArgs(otherAccount.address, 1, 1);
+      .withArgs(1, 1);
+
+    const member = await guild.getMember(1);
+
+    expect(member.name).to.equal("Member");
 
     expect(await guild.isMember(otherAccount.address)).to.equal(true);
   });
 
   it("should mint a nft for a future member and return the URI", async () => {
-    await expect(guild.createGuild("guild Test"));
-    await guild.mintMember(otherAccount, "ipfs://test", 1);
+    await guild.createGuild("guild Test");
+    await guild.mintMember("Member", otherAccount, "ipfs://test", 1);
+
+    const member = await guild.getMember(1);
+
     expect(await guild.isMember(otherAccount.address)).to.equal(true);
 
-    const tokenURI = await guild.tokenURI(1);
-    console.log("URI", tokenURI);
-
-    expect(tokenURI).to.equal("ipfs://test");
+    expect(member.uri).to.equal("ipfs://test");
   });
 
   it("shoud create a member by minting and get back the token URI by the address wallet", async () => {
-    await expect(guild.createGuild("guild Test"));
-    await guild.mintMember(otherAccount, "ipfs://test", 1);
+    await guild.createGuild("guild Test");
+    await guild.mintMember("Member", otherAccount, "ipfs://test", 1);
     expect(await guild.isMember(otherAccount.address)).to.equal(true);
 
-    const URI = await guild.getMemberURI(otherAccount);
-    expect(URI).to.equal("ipfs://test");
+    const member = await guild.getMember(1);
+    expect(member.uri).to.equal("ipfs://test");
   });
 
   it("should create 2 members of a guild and return the members", async () => {
     await guild.createGuild("guild Test");
-    await guild.mintMember(otherAccount.address, "ipfs://test", 1);
-    await guild.mintMember(otherAccount2.address, "ipfs://test", 1);
+    await guild.mintMember("Member1", otherAccount.address, "ipfs://test", 1);
+    await guild.mintMember("Member2", otherAccount2.address, "ipfs://test", 1);
 
     const members = await guild.getGuildMembers(1);
 
-    expect(members[0]).to.equal(otherAccount.address);
-    expect(members[1]).to.equal(otherAccount2.address);
+    await expect(members[0]).to.equal(1);
+    expect(members[1]).to.equal(2);
   });
 
   it("should create 3 members of a guild, delete 1 and get 2 members in the guild", async () => {
     await guild.createGuild("guild Test");
-    await guild.mintMember(otherAccount.address, "ipfs://test", 1);
-    await guild.mintMember(otherAccount2.address, "ipfs://test", 1);
-    await guild.mintMember(otherAccount3.address, "ipfs://test", 1);
+    await guild.mintMember("Member1", otherAccount.address, "ipfs://test", 1);
+    await guild.mintMember("Member2", otherAccount2.address, "ipfs://test", 1);
+    await guild.mintMember("Member3", otherAccount3.address, "ipfs://test", 1);
 
-    await expect(guild.removeGuildMember(otherAccount2.address))
+    await expect(guild.removeGuildMember(2))
       .to.emit(guild, "MemberRemoved")
-      .withArgs(otherAccount2.address, 2, 1);
+      .withArgs(2, 1);
 
     const members = await guild.getGuildMembers(1);
 
     expect(members.length).to.equal(2);
-    expect(members[0]).to.equal(otherAccount.address);
-    expect(members[1]).to.equal(otherAccount3.address);
+    expect(members[0]).to.equal(1);
+    expect(members[1]).to.equal(3);
   });
 
-  it("should disable not add a member if the guild is deactivate", async () => {
+  it("should not allowed to add a member if the guild is deactivate", async () => {
     await guild.createGuild("guild Test");
-    await guild.mintMember(otherAccount.address, "ipfs://test", 1);
+    await guild.mintMember("Member", otherAccount.address, "ipfs://test", 1);
 
     await guild.disableGuild(1);
 
     await expect(
-      guild.mintMember(otherAccount2.address, "ipfs://test", 1),
-    ).to.be.revertedWith("GuildNFT: guild does not exist");
+      guild.mintMember("Member2", otherAccount2.address, "ipfs://test", 1),
+    ).to.be.revertedWith("GuildNFT: guild not active");
   });
 
   describe("GuildNFT management member and find role", function () {
@@ -148,41 +152,115 @@ describe("GuildNFT creation member and retrieve nft", function () {
       ({ guild, owner, otherAccount } = await initContract());
     });
 
+    it("should create 3 members of a guild, returns all", async () => {
+      await guild.createGuild("guild Test");
+      await guild.mintMember("Member1", otherAccount.address, "ipfs://test", 1);
+      await guild.mintMember(
+        "Member2",
+        otherAccount2.address,
+        "ipfs://test",
+        1,
+      );
+      await guild.mintMember(
+        "Member3",
+        otherAccount3.address,
+        "ipfs://test",
+        1,
+      );
+
+      const allMembers = await guild.getAllMembers();
+      expect(allMembers[0].id).to.equal(1);
+      expect(allMembers[1].id).to.equal(2);
+      expect(allMembers[2].id).to.equal(3);
+      const memberCount = await guild.getMemberCount();
+      expect(memberCount).to.equal(3);
+    });
+
+    it("should create 3 members of a guild, 2 in guild id 1 and 1 in guild id 2", async () => {
+      await guild.createGuild("guild Test");
+      await guild.createGuild("guild Test2");
+      await guild.mintMember("Member1", otherAccount.address, "ipfs://test", 1);
+      await guild.mintMember(
+        "Member2",
+        otherAccount2.address,
+        "ipfs://test",
+        2,
+      );
+      await guild.mintMember(
+        "Member3",
+        otherAccount3.address,
+        "ipfs://test",
+        1,
+      );
+
+      const allMembers = await guild.getAllMembers();
+      expect(allMembers[0].guildId).to.equal(1);
+      expect(allMembers[1].guildId).to.equal(2);
+      expect(allMembers[2].guildId).to.equal(1);
+
+      const memberCount = await guild.getMemberCount();
+      expect(memberCount).to.equal(3);
+
+      const memberInGuild1 = await guild.getGuildMembers(1);
+      expect(memberInGuild1.length).to.equal(2);
+
+      const memberInGuild2 = await guild.getGuildMembers(2);
+      expect(memberInGuild2.length).to.equal(1);
+    });
+
+    it("should create 3 members of a guild, 2 in guild id 1 and 1 in guild id 2, we delete guild id 1 it should remove the members too", async () => {
+      await guild.createGuild("guild Test");
+      await guild.createGuild("guild Test2");
+      await guild.mintMember("Member1", otherAccount.address, "ipfs://test", 1);
+      await guild.mintMember(
+        "Member2",
+        otherAccount2.address,
+        "ipfs://test",
+        2,
+      );
+      await guild.mintMember(
+        "Member3",
+        otherAccount3.address,
+        "ipfs://test",
+        1,
+      );
+
+      await expect(guild.removeGuild(1))
+        .to.emit(guild, "GuildRemoved")
+        .withArgs(1, 2);
+
+      const allMembersArray = await guild.getAllMembers();
+      expect(allMembersArray.length).to.equal(1);
+
+      const memberInGuild2 = await guild.getGuildMembers(2);
+      expect(memberInGuild2.length).to.equal(1);
+    });
+
     it("should create a member and give him a member role", async () => {
       await guild.createGuild("guild Test");
-      await expect(guild.mintMember(otherAccount, "ipfs://test", 1))
+      await expect(guild.mintMember("Member", otherAccount, "ipfs://test", 1))
         .to.emit(guild, "MemberMinted")
-        .withArgs(otherAccount.address, 1, 1);
+        .withArgs(1, 1);
 
       expect(await guild.isMember(otherAccount.address)).to.equal(true);
-      expect(await guild.getRole(1)).to.equal(0);
+
+      const myMember = await guild.getMember(1);
+      expect(myMember.role).to.equal(0);
     });
 
     it("should create a member and give him a member role and upgrade to senior", async () => {
       await guild.createGuild("guild Test");
-      await guild.mintMember(otherAccount, "ipfs://test", 1);
+      await guild.mintMember("Member", otherAccount, "ipfs://test", 1);
 
       expect(await guild.isMember(otherAccount.address)).to.equal(true);
-      expect(await guild.getRole(1)).to.equal(0);
+      const myMember = await guild.getMember(1);
+      expect(myMember.role).to.equal(0);
 
-      await expect(guild.upgradeMember(otherAccount, 1))
+      await expect(guild.upgradeMember(1, 1))
         .to.emit(guild, "MemberUpgraded")
         .withArgs(1, 1);
-      expect(await guild.getRole(1)).to.equal(1);
-    });
-
-    it("should retrieve the role of a member by the address", async () => {
-      let memberRole;
-
-      await guild.createGuild("guild Test");
-
-      await guild.mintMember(otherAccount, "ipfs://test", 1);
-      memberRole = await guild.getRoleByWallet(otherAccount);
-      expect(memberRole).to.equal(0);
-
-      await guild.upgradeMember(otherAccount, 1);
-      memberRole = await guild.getRoleByWallet(otherAccount);
-      expect(memberRole).to.equal(1);
+      const myMemberUpdated = await guild.getMember(1);
+      expect(myMemberUpdated.role).to.equal(1);
     });
   });
 });

@@ -6,17 +6,17 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract GuildNFT is Initializable,
-    ERC721Upgradeable,
-    OwnableUpgradeable,
-    UUPSUpgradeable
-{
+contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSUpgradeable {
+
     // =========================================
-    // ENUM 
+    // ENUMS
     // =========================================
     enum Role { Member, Senior, Master }
     enum GuildState { All, Active, Inactive }
 
+    // =========================================
+    // STRUCTS
+    // =========================================
     struct Guild {
         uint256 id;
         string name;
@@ -35,27 +35,26 @@ contract GuildNFT is Initializable,
     // =========================================
     // STATE VARIABLES
     // =========================================
-    uint256 private _memberIdCounter;   // latest member ID issued
-    uint256 private _guildIdCounter;    // latest guild ID issued
-    uint256 private _memberCounter;     // active members count
-    uint256 private _guildCounter;      // active guilds count
+    uint256 private _memberIdCounter;
+    uint256 private _guildIdCounter;
+    uint256 private _guildCounter;
+    uint256 private _memberCounter;
 
     mapping(uint256 => Member) private _members;
     mapping(uint256 => Guild) private _guilds;
-    mapping(uint256 => uint256) private _memberIdGuildId; // memberId → guildId
-    mapping(uint256 => uint256[]) private _guildMembers;   // guildId → memberIds
+    mapping(uint256 => uint256[]) private _guildMembers; // guildId → list of member IDs
 
     // =========================================
     // EVENTS
     // =========================================
-    event GuildCreated(uint256 indexed guildId, string name);
-    event GuildRemoved(uint256 indexed guildId);
-    event MemberMinted(uint256 indexed memberId, uint256 indexed guildId);
-    event MemberUpgraded(uint256 indexed memberId, Role newRole);
-    event MemberRemoved(uint256 indexed memberId, uint256 indexed guildId);
+    event GuildCreated(uint256 guildId, string name);
+    event GuildRemoved(uint256 guildId, uint256 deletedMembers);
+    event MemberMinted(uint256 memberId, uint256 guildId);
+    event MemberUpgraded(uint256 memberId, Role newRole);
+    event MemberRemoved(uint256 memberId, uint256 guildId);
 
     // =========================================
-    // INITIALIZER
+    // CONSTRUCTOR & INITIALIZE
     // =========================================
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -77,6 +76,11 @@ contract GuildNFT is Initializable,
 
     modifier guildExists(uint256 guildId) {
         require(_guilds[guildId].id != 0, "GuildNFT: guild does not exist");
+        _;
+    }
+
+    modifier guildActivated(uint256 guildId) {
+        require(_guilds[guildId].active != false, "GuildNFT: guild not active");
         _;
     }
 
@@ -103,34 +107,41 @@ contract GuildNFT is Initializable,
 
     function removeGuild(uint256 guildId) external onlyOwner guildExists(guildId) {
         uint256[] storage guildMembers = _guildMembers[guildId];
-
+        uint256 deletedMembers = 0;
         for (uint256 i = 0; i < guildMembers.length; i++) {
-            uint256 memberId = guildMembers[i];
-            _burn(memberId);
-            delete _members[memberId];
-            delete _memberIdGuildId[memberId];
+            _burn(guildMembers[i]);
+            delete _members[guildMembers[i]];
             _memberCounter--;
-
-            emit MemberRemoved(memberId, guildId);
+            deletedMembers++;
         }
 
-        delete _guilds[guildId];
         delete _guildMembers[guildId];
+        delete _guilds[guildId];
         _guildCounter--;
 
-        emit GuildRemoved(guildId);
+        emit GuildRemoved(guildId, deletedMembers);
     }
 
-    function getAllGuilds(GuildState state) external view returns(Guild[] memory) {
+    function disableGuild(uint256 guildId) external onlyOwner guildExists(guildId) returns (bool) {
+        _guilds[guildId].active = false;
+        return false;
+    }
+
+    function enableGuild(uint256 guildId) external onlyOwner guildExists(guildId) returns (bool) {
+        _guilds[guildId].active = true;
+        return true;
+    }
+
+    function getAllGuilds(GuildState filter) external view returns (Guild[] memory) {
         uint256 count = 0;
         for (uint256 i = 1; i <= _guildIdCounter; i++) {
-            if (_matchesFilter(i, state)) count++;
+            if (_matchesFilter(i, filter)) count++;
         }
 
         Guild[] memory allGuilds = new Guild[](count);
         uint256 index = 0;
         for (uint256 i = 1; i <= _guildIdCounter; i++) {
-            if(_matchesFilter(i, state)){
+            if (_matchesFilter(i, filter)) {
                 allGuilds[index] = _guilds[i];
                 index++;
             }
@@ -145,61 +156,36 @@ contract GuildNFT is Initializable,
         return true;
     }
 
-    function getGuildCount() external view returns(uint256) {
+    function getGuildCount() external view returns (uint256) {
         return _guildCounter;
     }
 
     function getRecentGuilds(uint256 limit) external view returns (Guild[] memory) {
-        uint256 count = 0;
-        uint256 current = _guildIdCounter;
-
-        while (current > 0 && count < limit) {
-            if (_guilds[current].id != 0) {
-                count++;
-            }
-            current--;
-        }
-
+        uint256 count = limit > _guildCounter ? _guildCounter : limit;
         Guild[] memory recent = new Guild[](count);
         uint256 index = 0;
-        current = _guildIdCounter;
-
-        while (current > 0 && index < count) {
-            if (_guilds[current].id != 0) {
-                recent[index] = _guilds[current];
+        for (uint256 i = _guildIdCounter; i >= 1 && index < count; i--) {
+            if (_guilds[i].id != 0) {
+                recent[index] = _guilds[i];
                 index++;
             }
-            current--;
         }
-
         return recent;
-    }
-
-    function getGuildMembers(uint256 guildId) external view guildExists(guildId) returns (uint256[] memory) {
-        return _guildMembers[guildId];
-    }
-
-    function enableGuild(uint256 guildId) external onlyOwner guildExists(guildId) returns(bool) {
-        Guild storage g = _guilds[guildId];
-        g.active = true;
-        return g.active;
-    }
-
-    function disableGuild(uint256 guildId) external onlyOwner guildExists(guildId) returns(bool) {
-        Guild storage g = _guilds[guildId];
-        g.active = false;
-        return g.active;
     }
 
     function getGuild(uint256 guildId) external view guildExists(guildId) returns (Guild memory) {
         return _guilds[guildId];
     }
 
+    function getGuildMembers(uint256 guildId) external view guildExists(guildId) returns (uint256[] memory) {
+        return _guildMembers[guildId];
+    }
+
     // =========================================
     // MEMBER FUNCTIONS
     // =========================================
-    function mintMember(string memory name, address to, string memory uri, uint256 guildId) 
-        external onlyOwner notAlreadyMember(to) guildExists(guildId)
+    function mintMember(string memory name, address to, string memory uri, uint256 guildId)
+        external onlyOwner notAlreadyMember(to) guildExists(guildId) guildActivated(guildId)
     {
         _memberIdCounter++;
         _memberCounter++;
@@ -214,56 +200,27 @@ contract GuildNFT is Initializable,
             uri: uri
         });
 
-        _memberIdGuildId[_memberIdCounter] = guildId;
         _guildMembers[guildId].push(_memberIdCounter);
-
         emit MemberMinted(_memberIdCounter, guildId);
     }
 
     function removeGuildMember(uint256 memberId) external onlyOwner memberExists(memberId) {
         uint256 guildId = _members[memberId].guildId;
-        uint256 membersIdsCount = _guildMembers[guildId].length;
+        uint256[] storage memberIds = _guildMembers[guildId];
 
-        for(uint256 i = 0; i < membersIdsCount; i++){
-            if(_guildMembers[guildId][i] == memberId){
-                _guildMembers[guildId][i] = _guildMembers[guildId][membersIdsCount - 1];
-                _guildMembers[guildId].pop();
+        for (uint256 i = 0; i < memberIds.length; i++) {
+            if (memberIds[i] == memberId) {
+                memberIds[i] = memberIds[memberIds.length - 1];
+                memberIds.pop();
                 break;
             }
         }
 
         _burn(memberId);
         delete _members[memberId];
-        delete _memberIdGuildId[memberId];
         _memberCounter--;
 
         emit MemberRemoved(memberId, guildId);
-    }
-
-    function getAllMembers() external view returns(Member[] memory) {
-        Member[] memory result = new Member[](_memberCounter);
-        uint256 index = 0;
-        for(uint256 i = 1; i <= _memberIdCounter; i++){
-            if(_members[i].id != 0){
-                result[index] = _members[i];
-                index++;
-            }
-        }
-        return result;
-    }
-
-    function getMemberCount() external view returns(uint256) {
-        return _memberCounter;
-    }
-
-    function isMember(address wallet) external view returns(bool) {
-        return balanceOf(wallet) > 0;
-    }
-
-    function isMemberOfGuild(uint256 memberId, uint256 guildId) 
-        external view memberExists(memberId) guildExists(guildId) returns(bool) 
-    {
-        return _members[memberId].guildId == guildId;
     }
 
     function upgradeMember(uint256 memberId, Role newRole) external onlyOwner memberExists(memberId) {
@@ -271,10 +228,45 @@ contract GuildNFT is Initializable,
         emit MemberUpgraded(memberId, newRole);
     }
 
+    function getMember(uint256 memberId) external view memberExists(memberId) returns (Member memory) {
+        return _members[memberId];
+    }
 
+    function getMemberCount() external view returns (uint256) {
+        return _memberCounter;
+    }
+
+    function getAllMembers() external view returns (Member[] memory) {
+        Member[] memory allMembers = new Member[](_memberCounter);
+        uint256 index = 0;
+        for (uint256 i = 1; i <= _memberIdCounter; i++) {
+            if (_members[i].id != 0) {
+                allMembers[index] = _members[i];
+                index++;
+            }
+        }
+        return allMembers;
+    }
+
+    function isMember(address wallet) external view returns (bool) {
+        return balanceOf(wallet) > 0;
+    }
+
+    function isMemberOfGuild(uint256 memberId, uint256 guildId)
+        external view memberExists(memberId) guildExists(guildId) returns (bool)
+    {
+        return _members[memberId].guildId == guildId;
+    }
 
     // =========================================
-    // UUPS Upgrade
+    // TOKEN URI
+    // =========================================
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        return _members[tokenId].uri;
+    }
+
+    // =========================================
+    // INTERNAL
     // =========================================
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
