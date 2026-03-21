@@ -58,7 +58,12 @@ export default function MembersModal({ onClose }: MembersModalProps) {
       });
 
       const tokenURI = `ipfs://${metadataResult.cid}`;
-      mintMember(addressMember, tokenURI, parseInt(selectedGuildId));
+      mintMember(
+        memberName,
+        addressMember,
+        tokenURI,
+        parseInt(selectedGuildId),
+      );
       onClose();
     } catch (err) {
       console.error("Upload failed:", err);

@@ -173,6 +173,15 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
         return recent;
     }
 
+
+    function getGuildCountByState(GuildState filter) external view returns (uint256) {
+        uint256 count = 0;
+        for (uint256 i = 1; i <= _guildIdCounter; i++) {
+            if (_matchesFilter(i, filter)) count++;
+        }
+        return count;
+    }
+
     function getGuild(uint256 guildId) external view guildExists(guildId) returns (Guild memory) {
         return _guilds[guildId];
     }

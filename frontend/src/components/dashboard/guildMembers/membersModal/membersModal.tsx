@@ -1,10 +1,10 @@
 "use client";
 import { Guild } from "@/constants/constants";
 import styles from "./membersModal.module.css";
-import { useState, useEffect } from "react";
-import { useGuild } from "@/hooks/useGuild";
+import { useState, useEffect, useRef } from "react";
 import ListMember from "../ListMember/listMember";
 import { useManagementGuild } from "@/hooks/useManagementGuilds";
+import { useGuild } from "@/hooks/useGuild";
 
 type MembersModalProps = {
   onClose: () => void;
@@ -19,25 +19,35 @@ export default function MembersModal({
   active,
   guildCard,
 }: MembersModalProps) {
-  const [memberName, setMemberName] = useState("");
   const [activeGuild, setActiveGuild] = useState(active);
+  const pendingStatus = useRef<boolean | null>(null);
 
-  const { enableStatus, disableStatus, isStatusGuildSuccess } =
-    useManagementGuild();
+  const {
+    enableStatus,
+    disableStatus,
+    isStatusGuildPending,
+    isStatusGuildSuccess,
+  } = useManagementGuild();
 
-  useEffect(() => {}, [activeGuild]);
+  const { refetchCounterActive, refetchCounterInactive } = useGuild();
+  const { refetchGuilds } = useGuild();
 
   const clickStatus = () => {
+    pendingStatus.current = !activeGuild;
     if (activeGuild) {
-      disableStatus(parseInt(guildCard.id.toString()));
+      disableStatus(Number(guildCard.id));
     } else {
-      enableStatus(parseInt(guildCard.id.toString()));
+      enableStatus(Number(guildCard.id));
     }
   };
 
   useEffect(() => {
-    if (isStatusGuildSuccess) {
-      setActiveGuild((prev) => !prev);
+    if (isStatusGuildSuccess && pendingStatus.current !== null) {
+      setActiveGuild(pendingStatus.current);
+      refetchGuilds();
+      refetchCounterActive();
+      refetchCounterInactive();
+      pendingStatus.current = null;
     }
   }, [isStatusGuildSuccess]);
 
@@ -55,7 +65,7 @@ export default function MembersModal({
           </span>
           <div>
             {listMembers.map((member: string, i: number) => (
-              <ListMember addressMember={member}></ListMember>
+              <ListMember key={i} addressMember={member} />
             ))}
           </div>
         </div>
@@ -66,14 +76,23 @@ export default function MembersModal({
         >
           ⟶ Deploy Quest On-Chain
         </button>
-        <div className={styles.toggleContainer} onClick={clickStatus}>
+
+        <div
+          className={styles.toggleContainer}
+          onClick={!isStatusGuildPending ? clickStatus : undefined}
+        >
           <span className={styles.toggleLabel}>Status</span>
           <button
             className={`${styles.toggle} ${activeGuild ? styles.toggleActive : styles.toggleInactive}`}
+            disabled={isStatusGuildPending}
           >
             <div className={styles.toggleThumb} />
             <span className={styles.toggleText}>
-              {activeGuild ? "Active" : "Inactive"}
+              {isStatusGuildPending
+                ? "Pending..."
+                : activeGuild
+                  ? "Active"
+                  : "Inactive"}
             </span>
           </button>
         </div>

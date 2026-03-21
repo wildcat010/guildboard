@@ -52,6 +52,7 @@ export function useManagementGuild() {
   }
 
   function mintMember(
+    name: string,
     addressMember: string,
     tokenURI: string,
     selectedGuildId: number,
@@ -60,7 +61,12 @@ export function useManagementGuild() {
       address: GUILD_NFT_ADDRESS,
       abi: GUILD_NFT_ABI,
       functionName: "mintMember",
-      args: [addressMember as `0x${string}`, tokenURI, BigInt(selectedGuildId)],
+      args: [
+        name,
+        addressMember as `0x${string}`,
+        tokenURI,
+        BigInt(selectedGuildId),
+      ],
     });
   }
 

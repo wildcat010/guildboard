@@ -10,8 +10,17 @@ import { useGuild } from "@/hooks/useGuild";
 export default function AddMemberModal() {
   const [showModalCreateGuild, setShowModalCreateGuild] = useState(false);
 
-  const { guilds, refetchGuilds, refetchGuildsCount, refetchGuildsLimit } =
-    useGuild();
+  const {
+    guilds,
+    refetchGuilds,
+    refetchGuildsCount,
+    refetchGuildsLimit,
+    guildCount,
+    activeGuildCount,
+    inactiveGuildCount,
+    refetchCounterActive,
+    refetchCounterInactive,
+  } = useGuild(5, 0);
 
   const guildsArray = (guilds as Guild[]) ?? [];
 
@@ -20,6 +29,8 @@ export default function AddMemberModal() {
       refetchGuilds();
       refetchGuildsCount();
       refetchGuildsLimit();
+      refetchCounterActive();
+      refetchCounterInactive();
     }, 500);
   };
 
@@ -27,7 +38,11 @@ export default function AddMemberModal() {
     <div className={styles.content}>
       <div className={`${styles.pageHeader} ${styles.animateIn}`}>
         <div>
-          <div className={styles.pageTitle}>Guilds </div>
+          <div className={styles.pageTitle}>
+            Guilds - All {guildCount as number}/Active{" "}
+            {Number(activeGuildCount ?? 0)}/ Inactive{" "}
+            {Number(inactiveGuildCount ?? 0)}
+          </div>
         </div>
         <div
           style={{
@@ -48,7 +63,7 @@ export default function AddMemberModal() {
       </div>
       <div className={styles.pageGuilds}>
         {guildsArray.map((guild: Guild) => (
-          <GuildCard guildCard={guild}></GuildCard>
+          <GuildCard key={guild.id.toString()} guildCard={guild}></GuildCard>
         ))}
       </div>
 

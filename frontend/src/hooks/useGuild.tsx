@@ -4,9 +4,8 @@ import { useAccount } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function useGuild(limit = 5) {
+export function useGuild(limit = 5, guildState = 0) {
   const { address, isConnected } = useAccount();
-  const queryClient = useQueryClient();
 
   const { data: contractOwner } = useReadContract({
     address: GUILD_NFT_ADDRESS,
@@ -31,8 +30,27 @@ export function useGuild(limit = 5) {
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "getAllGuilds",
+    args: [guildState],
     query: { enabled: isOwner, retry: false },
   });
+
+  const { data: activeGuildCount, refetch: refetchCounterActive } =
+    useReadContract({
+      address: GUILD_NFT_ADDRESS,
+      abi: GUILD_NFT_ABI,
+      functionName: "getGuildCountByState",
+      args: [1], // Active
+      query: { retry: false },
+    });
+
+  const { data: inactiveGuildCount, refetch: refetchCounterInactive } =
+    useReadContract({
+      address: GUILD_NFT_ADDRESS,
+      abi: GUILD_NFT_ABI,
+      functionName: "getGuildCountByState",
+      args: [2], // Inactive
+      query: { retry: false },
+    });
 
   const { data: guildCount, refetch: refetchGuildsCount } = useReadContract({
     address: GUILD_NFT_ADDRESS,
@@ -59,5 +77,9 @@ export function useGuild(limit = 5) {
     refetchGuilds,
     refetchGuildsCount,
     refetchGuildsLimit,
+    activeGuildCount,
+    inactiveGuildCount,
+    refetchCounterActive,
+    refetchCounterInactive,
   };
 }
