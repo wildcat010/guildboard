@@ -1,7 +1,7 @@
 "use client";
 import { Guild, Member, roleNames } from "@/constants/constants";
 import styles from "./listMember.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMember } from "@/hooks/useMember";
 import MemberModal from "../../memberModal/memberModal";
 
@@ -10,7 +10,7 @@ type ListMemberProps = {
 };
 
 export default function ListMember({ memberId }: ListMemberProps) {
-  const { getMemberById } = useMember(memberId);
+  const { getMemberById, refetchMember } = useMember(memberId);
   const [memberModal, setMemberModal] = useState(false);
   const member = getMemberById as Member;
 
@@ -19,7 +19,11 @@ export default function ListMember({ memberId }: ListMemberProps) {
   return (
     <>
       {memberModal && (
-        <MemberModal member={member} onClose={() => setMemberModal(false)} />
+        <MemberModal
+          member={member}
+          refetchMember={refetchMember}
+          onClose={() => setMemberModal(false)}
+        />
       )}
       <div
         className={styles.memberListItem}

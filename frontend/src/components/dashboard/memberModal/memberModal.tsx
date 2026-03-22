@@ -2,19 +2,39 @@
 import styles from "./memberModal.module.css";
 import { Guild, Member } from "./../../../constants/constants";
 import { roleNames } from "./../../../constants/constants";
-import { useState } from "react";
-import { useManagementGuild } from "@/hooks/useManagementGuilds";
+import { useState, useEffect, useRef } from "react";
 import { useGuildById } from "@/hooks/useGuildById";
+import { useManagementMember } from "@/hooks/useManagementMember";
+import { useGuild } from "@/hooks/useGuild";
+import { useMember } from "@/hooks/useMember";
 
 type MemberModalProps = {
   onClose: () => void;
   member: Member;
+  refetchMember: () => void;
 };
 
-export default function MemberModal({ onClose, member }: MemberModalProps) {
+export default function MemberModal({
+  onClose,
+  member,
+  refetchMember,
+}: MemberModalProps) {
   const [selectedRole, setSelectedRole] = useState(Number(member.role));
 
-  const { getGuildById } = useGuildById(Number(member.guildId));
+  const {
+    upgradeMember,
+    removeMember,
+    isUpgradingPending,
+    isRemoveMemberPending,
+    isUpgradingSuccess,
+    isRemoveMemberSuccess,
+  } = useManagementMember();
+  const { refetchGuilds } = useGuild();
+  const { refetchGuildMembers, getGuildById } = useGuildById(
+    Number(member.guildId),
+  );
+
+  const pendingClose = useRef(false);
   const guild = getGuildById as Guild;
 
   const currentRole = Number(member.role);
@@ -22,12 +42,29 @@ export default function MemberModal({ onClose, member }: MemberModalProps) {
   const memberId = Number(member.id);
 
   function handleUpgrade() {
-    //upgradeMember(memberId, selectedRole);
+    upgradeMember(memberId, selectedRole);
   }
 
   function handleDelete() {
-    //removeMember(memberId, () => onClose());
+    pendingClose.current = true;
+    removeMember(memberId);
   }
+
+  useEffect(() => {
+    if (isRemoveMemberSuccess && pendingClose.current) {
+      pendingClose.current = false;
+      refetchGuilds();
+      refetchGuildMembers();
+      onClose();
+    }
+  }, [isRemoveMemberSuccess, refetchGuilds, refetchGuildMembers, onClose]);
+
+  useEffect(() => {
+    if (isUpgradingSuccess) {
+      refetchGuildMembers();
+      refetchMember();
+    }
+  }, [isUpgradingSuccess, refetchGuildMembers, refetchMember]);
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -77,18 +114,18 @@ export default function MemberModal({ onClose, member }: MemberModalProps) {
             <button
               className={styles.button}
               onClick={handleDelete}
-              // disabled={isRemovePending}
+              disabled={isRemoveMemberPending}
             >
-              {"🗑 Delete"}
+              {isRemoveMemberPending ? "🗑 Deleting..." : "🗑 Delete"}
             </button>
 
             {roleChanged && (
               <button
                 className={styles.button}
                 onClick={handleUpgrade}
-                // disabled={isUpgradePending}
+                disabled={isUpgradingPending}
               >
-                {"⬆ Upgrade"}
+                {isUpgradingPending ? "⬆ Upgrading..." : "⬆ Upgrade"}
               </button>
             )}
           </div>
