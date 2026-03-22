@@ -1,5 +1,5 @@
 "use client";
-import { Guild } from "@/constants/constants";
+import { Guild, Member } from "@/constants/constants";
 import styles from "./membersModal.module.css";
 import { useState, useEffect, useRef } from "react";
 import ListMember from "../ListMember/listMember";
@@ -8,7 +8,7 @@ import { useGuild } from "@/hooks/useGuild";
 
 type MembersModalProps = {
   onClose: () => void;
-  listMembers: string[];
+  listMembers: number[];
   active: boolean;
   guildCard: Guild;
 };
@@ -60,12 +60,10 @@ export default function MembersModal({
         <div className={styles.modalTitle}>⚔ Guild Card - {guildCard.name}</div>
 
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>
-            Users address - {listMembers.length}
-          </span>
+          <span className={styles.formLabel}>Users - {listMembers.length}</span>
           <div>
-            {listMembers.map((member: string, i: number) => (
-              <ListMember key={i} addressMember={member} />
+            {listMembers.map((memberId: number, i: number) => (
+              <ListMember key={i} memberId={memberId} />
             ))}
           </div>
         </div>

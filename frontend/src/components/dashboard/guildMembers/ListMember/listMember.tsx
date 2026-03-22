@@ -1,31 +1,25 @@
 "use client";
-import { Guild } from "@/constants/constants";
+import { Guild, Member, roleNames } from "@/constants/constants";
 import styles from "./listMember.module.css";
 import { useState } from "react";
-import { useGuild } from "@/hooks/useGuild";
 import { useMember } from "@/hooks/useMember";
-import { roleNames } from "../../../../constants/constants";
 import MemberModal from "../../memberModal/memberModal";
 
 type ListMemberProps = {
-  addressMember: string;
+  memberId: number;
 };
 
-export default function ListMember({ addressMember }: ListMemberProps) {
-  const { roleByWallet } = useMember();
+export default function ListMember({ memberId }: ListMemberProps) {
+  const { getMemberById } = useMember(memberId);
   const [memberModal, setMemberModal] = useState(false);
-  const role = roleNames[roleByWallet as number] ?? "Unknow";
+  const member = getMemberById as Member;
+
+  if (!member) return <div className={styles.memberListItem}>Loading...</div>;
 
   return (
     <>
       {memberModal && (
-        <MemberModal
-          role={roleByWallet as number}
-          addressMember={addressMember}
-          onClose={() => {
-            setMemberModal(false);
-          }}
-        />
+        <MemberModal member={member} onClose={() => setMemberModal(false)} />
       )}
       <div
         className={styles.memberListItem}
@@ -34,10 +28,12 @@ export default function ListMember({ addressMember }: ListMemberProps) {
           setMemberModal(true);
         }}
       >
-        <div className={styles.miniHex}>K</div>
+        <div className={styles.miniHex}>{member.name}</div>
         <div className={styles.memberInfo}>
-          <div className={styles.memberListName}>{addressMember}</div>
-          <div className={styles.memberListRole}>{role}</div>
+          <div className={styles.memberListName}>{member.addressMember}</div>
+          <div className={styles.memberListRole}>
+            {roleNames[Number(member.role)]}
+          </div>
         </div>
         <div className={styles.memberUpdate}>Update</div>
       </div>

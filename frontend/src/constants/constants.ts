@@ -16,6 +16,15 @@ export type Guild = {
   active: boolean;
 };
 
+export type Member = {
+  id: bigint;
+  name: string;
+  addressMember: string;
+  role: number;
+  guildId: bigint;
+  uri: string;
+};
+
 export type Section =
   | "questboard"
   | "guildMembers"

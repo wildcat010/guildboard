@@ -14,7 +14,6 @@ export default function GuildCard({ guildCard }: GuildCardProps) {
   const { guildMembers } = useGuildById(
     Number(guildCard.active ? Number(guildCard.id) : 0),
   );
-  const listMembers = (guildMembers as string[]) ?? [];
 
   return (
     <>
@@ -27,7 +26,7 @@ export default function GuildCard({ guildCard }: GuildCardProps) {
       >
         <div className={styles.taskTitle}>{guildCard.name}</div>
         <div className={styles.taskSkills}>
-          <span className={styles.skillTag}>{listMembers.length}</span>
+          <span className={styles.skillTag}>{guildMembers.length}</span>
         </div>
 
         <div className={styles.taskFooter}>
@@ -39,7 +38,7 @@ export default function GuildCard({ guildCard }: GuildCardProps) {
       </div>
       {showModal && (
         <MembersModal
-          listMembers={listMembers}
+          listMembers={guildMembers}
           active={guildCard.active}
           guildCard={guildCard}
           onClose={() => setShowModal(false)}

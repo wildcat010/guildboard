@@ -3,39 +3,18 @@ import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 
-export function useMember(memberAddress?: string) {
-  const { address, isConnected } = useAccount();
+export function useMember(memberId: number) {
+  const { isConnected } = useAccount();
 
-  const { data: contractOwner } = useReadContract({
+  const { data: getMemberById } = useReadContract({
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
-    functionName: "owner",
+    functionName: "getMember",
+    args: [memberId],
     query: { enabled: isConnected },
   });
 
-  const isOwner =
-    isConnected &&
-    address?.toLowerCase() === (contractOwner as string)?.toLowerCase();
-
-  const { data: roleByWallet } = useReadContract({
-    address: GUILD_NFT_ADDRESS,
-    abi: GUILD_NFT_ABI,
-    functionName: "getRoleByWallet",
-    args: [memberAddress ?? address],
-    query: { enabled: isConnected && !!(memberAddress ?? address) },
-  });
-
-  const { data: role } = useReadContract({
-    address: GUILD_NFT_ADDRESS,
-    abi: GUILD_NFT_ABI,
-    functionName: "getRoleByWallet",
-    args: [address],
-    query: { enabled: isOwner },
-  });
-
   return {
-    roleByWallet,
-    isOwner,
-    role,
+    getMemberById,
   };
 }

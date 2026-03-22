@@ -1,54 +1,62 @@
 "use client";
-
 import styles from "./memberModal.module.css";
-import { useState, useEffect } from "react";
-import { Guild } from "./../../../constants/constants";
+import { Guild, Member } from "./../../../constants/constants";
 import { roleNames } from "./../../../constants/constants";
-import { useGuild } from "@/hooks/useGuild";
+import { useState } from "react";
+import { useManagementGuild } from "@/hooks/useManagementGuilds";
+import { useGuildById } from "@/hooks/useGuildById";
 
 type MemberModalProps = {
   onClose: () => void;
-  addressMember: string;
-  role: number;
+  member: Member;
 };
 
-export default function MemberModal({
-  onClose,
-  role,
-  addressMember,
-}: MemberModalProps) {
-  const [selectedRole, setSelectedRole] = useState(Number(role));
-  const [different, setDifferent] = useState(false);
-  const initialRole = role;
+export default function MemberModal({ onClose, member }: MemberModalProps) {
+  const [selectedRole, setSelectedRole] = useState(Number(member.role));
 
-  const isSelectedValid = !Number.isNaN(selectedRole);
-  const isInitialValid = !Number.isNaN(initialRole);
+  const { getGuildById } = useGuildById(Number(member.guildId));
+  const guild = getGuildById as Guild;
 
-  useEffect(() => {
-    if (isSelectedValid && isInitialValid) {
-      if (initialRole !== selectedRole) {
-        console.log("different");
-        setDifferent(true);
-      } else {
-        console.log("not different");
-        setDifferent(false);
-      }
-    }
-  }, [selectedRole]);
+  const currentRole = Number(member.role);
+  const roleChanged = selectedRole !== currentRole;
+  const memberId = Number(member.id);
+
+  function handleUpgrade() {
+    //upgradeMember(memberId, selectedRole);
+  }
+
+  function handleDelete() {
+    //removeMember(memberId, () => onClose());
+  }
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modal}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        {/* ── Header ── */}
         <button className={styles.modalClose} onClick={onClose}>
           ✕
         </button>
-        <div className={styles.modalTitle}>⚔ User Info</div>
+        <div className={styles.modalTitle}>⚔ Member Info</div>
+
+        {/* ── Address ── */}
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>User address</span>
-          <span className={styles.formLabelBig}>{addressMember}</span>
+          <span className={styles.formLabel}>Address</span>
+          <span className={styles.formLabelBig}>{member.addressMember}</span>
         </div>
+
+        {/* ── Guild ── */}
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>User Role</span>
+          <span className={styles.formLabel}>Guild</span>
+          <span className={styles.formLabelBig}>
+            {guild.name} - {guild.id}
+          </span>
+        </div>
+
+        {/* ── Role selector ── */}
+        <div className={styles.formGroup}>
+          <span className={styles.formLabel}>
+            Role — current: {roleNames[currentRole]}
+          </span>
           <select
             className={styles.select}
             value={selectedRole}
@@ -62,11 +70,27 @@ export default function MemberModal({
           </select>
         </div>
 
+        {/* ── Actions ── */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Actions</span>
           <div className={styles.container}>
-            <button className={styles.button}>Delete</button>
-            {different && <button className={styles.button}>Upgrade</button>}
+            <button
+              className={styles.button}
+              onClick={handleDelete}
+              // disabled={isRemovePending}
+            >
+              {"🗑 Delete"}
+            </button>
+
+            {roleChanged && (
+              <button
+                className={styles.button}
+                onClick={handleUpgrade}
+                // disabled={isUpgradePending}
+              >
+                {"⬆ Upgrade"}
+              </button>
+            )}
           </div>
         </div>
       </div>
