@@ -11,10 +11,7 @@ type GuildCardProps = {
 
 export default function GuildCard({ guildCard }: GuildCardProps) {
   const [showModal, setShowModal] = useState(false);
-  const { guildMembers } = useGuildById(
-    Number(guildCard.active ? Number(guildCard.id) : 0),
-  );
-
+  const { guildMembers } = useGuildById(Number(guildCard.id));
   return (
     <>
       <div

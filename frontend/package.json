@@ -19,6 +19,7 @@
     "pinata": "^2.5.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "simple-table-core": "^2.6.2",
     "siwe": "^3.0.0",
     "viem": "^2.47.0",
     "wagmi": "^2.19.5"

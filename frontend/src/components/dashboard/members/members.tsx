@@ -6,6 +6,7 @@ import { Guild, Section } from "./../../../constants/constants";
 
 import { useGuild } from "@/hooks/useGuild";
 import AddMemberModal from "./addMemberModal/membersModal";
+import MembersTable from "./membersTable/membersTable";
 
 export default function GuildMembers() {
   const [showModal, setShowModal] = useState(false);
@@ -25,7 +26,7 @@ export default function GuildMembers() {
           + Create Member
         </button>
       </div>
-
+      <MembersTable></MembersTable>
       {showModal && <AddMemberModal onClose={() => setShowModal(false)} />}
     </div>
   );

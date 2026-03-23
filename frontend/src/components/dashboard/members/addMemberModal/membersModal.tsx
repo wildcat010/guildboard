@@ -1,7 +1,7 @@
 "use client";
 import { Guild } from "@/constants/constants";
 import styles from "./membersModal.module.css";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useGuild } from "@/hooks/useGuild";
 import { useManagementGuild } from "@/hooks/useManagementGuilds";
 import { PinataSDK } from "pinata";
@@ -19,26 +19,27 @@ export default function MembersModal({ onClose }: MembersModalProps) {
   const [memberName, setMemberName] = useState("");
   const [addressMember, setAddressMember] = useState("");
   const [selectedGuildId, setSelectedGuildId] = useState("");
-
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
 
-  const {
-    createGuild,
-    mintMember,
-    isMemberPending,
-    isMemberSuccess,
-    isMemberError,
-  } = useManagementGuild();
+  const pendingClose = useRef(false);
+
+  const { mintMember, isMemberPending, isMemberSuccess, isMemberError } =
+    useManagementGuild();
+
   const { guilds } = useGuild();
-  const guildsArray = (guilds as Guild[]) ?? [];
+  const guildsArray =
+    (guilds as Guild[]).filter((guild) => guild.active == true) ?? [];
+
+  useEffect(() => {
+    if (isMemberSuccess && pendingClose.current) {
+      pendingClose.current = false;
+      onClose();
+    }
+  }, [isMemberSuccess, onClose]);
 
   async function handleSubmit() {
-    if (isMemberSuccess) {
-      onClose();
-      return;
-    }
     if (
       !memberName.trim() ||
       !addressMember.trim() ||
@@ -46,6 +47,7 @@ export default function MembersModal({ onClose }: MembersModalProps) {
       !imageFile
     )
       return;
+
     setIsUploading(true);
     try {
       const imageResult = await pinata.upload.public.file(imageFile);
@@ -58,15 +60,16 @@ export default function MembersModal({ onClose }: MembersModalProps) {
       });
 
       const tokenURI = `ipfs://${metadataResult.cid}`;
+      pendingClose.current = true;
       mintMember(
         memberName,
         addressMember,
         tokenURI,
         parseInt(selectedGuildId),
       );
-      onClose();
     } catch (err) {
       console.error("Upload failed:", err);
+      pendingClose.current = false;
     } finally {
       setIsUploading(false);
     }
@@ -79,6 +82,8 @@ export default function MembersModal({ onClose }: MembersModalProps) {
     setImagePreview(URL.createObjectURL(file));
   }
 
+  const isLoading = isUploading || isMemberPending;
+
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -86,16 +91,24 @@ export default function MembersModal({ onClose }: MembersModalProps) {
           <h2>Add Member</h2>
           <button onClick={onClose}>✕</button>
         </div>
+
         <div className={styles.modalBody}>
           <label>Member Name</label>
-          <input type="text" onChange={(e) => setMemberName(e.target.value)} />
+          <input
+            type="text"
+            value={memberName}
+            onChange={(e) => setMemberName(e.target.value)}
+          />
         </div>
+
         <div className={styles.modalBody}>
           <label>Member Address</label>
           <input
             type="text"
+            value={addressMember}
             onChange={(e) => setAddressMember(e.target.value)}
           />
+
           <label>Guild</label>
           <select
             value={selectedGuildId}
@@ -127,12 +140,15 @@ export default function MembersModal({ onClose }: MembersModalProps) {
         </div>
 
         <div className={styles.modalFooter}>
-          <button onClick={onClose}>Cancel</button>
-          <button
-            onClick={handleSubmit}
-            disabled={isUploading && isMemberPending}
-          >
-            {isMemberPending && isUploading ? "Creating..." : "Create Member"}
+          <button onClick={onClose} disabled={isLoading}>
+            Cancel
+          </button>
+          <button onClick={handleSubmit} disabled={isLoading}>
+            {isUploading
+              ? "Uploading to IPFS..."
+              : isMemberPending
+                ? "Confirm in MetaMask..."
+                : "Create Member"}
           </button>
         </div>
       </div>

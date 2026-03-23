@@ -1,7 +1,7 @@
 {
   "network": "localhost",
-  "guildNFT": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
-  "guildboard": "0x3Aa5ebB10DC797CAC828524e59A333d0A371443c",
-  "deployedAt": "2026-03-21T15:45:52.676Z",
+  "guildNFT": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+  "guildboard": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+  "deployedAt": "2026-03-23T15:00:59.823Z",
   "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
 }
