@@ -18,56 +18,28 @@ const headers = [
   { accessor: "action", label: "", width: 120 },
 ];
 
+function GuildName({ guildId }: { guildId: number }) {
+  const { getGuildById } = useGuildById(guildId);
+  const guild = getGuildById as Guild | null;
+  return <div className="guildCell">{guild?.name ?? `Guild #${guildId}`}</div>;
+}
+
 export default function MembersTable() {
   const { getAllMembers } = useMember();
   const membersArray = (getAllMembers as Member[]) ?? [];
 
-  const [rows, setRows] = useState<any[]>([]);
-  const [guildNames, setGuildNames] = useState<Record<number, string>>({});
-
-  // fetch all guild names once
-  useEffect(() => {
-    async function fetchGuilds() {
-      const names: Record<number, string> = {};
-      for (const member of membersArray) {
-        const guildId = Number(member.guildId);
-        if (!names[guildId]) {
-          const { getGuildById } = useGuildById(guildId);
-          const guild = getGuildById as Guild;
-          console.log("guild", guild);
-          if (guild.name) {
-            names[guildId] = guild.name;
-          } else {
-            names[guildId] = `Guild #${guildId}`;
-          }
-        }
-      }
-      setGuildNames(names);
-    }
-
-    fetchGuilds();
-  }, [membersArray]);
-
-  useEffect(() => {
-    const formatted = membersArray.map((member) => ({
-      id: Number(member.id),
-      user: (
-        <div className="userCell">
-          <div className="userName">{member.name}</div>
-          <div className="userRole">{roleNames[Number(member.role)]}</div>
-        </div>
-      ),
-      addressMember: <div className="addressCell">{member.addressMember}</div>,
-      guildName: (
-        <div className="guildCell">
-          {guildNames[Number(member.guildId)] ?? `Guild #${member.guildId}`}
-        </div>
-      ),
-      action: <button className="updateBtn">Update</button>,
-    }));
-
-    setRows(formatted);
-  }, [membersArray, guildNames]);
+  const rows = membersArray.map((member) => ({
+    id: Number(member.id),
+    user: (
+      <div className="userCell">
+        <div className="userName">{member.name}</div>
+        <div className="userRole">{roleNames[Number(member.role)]}</div>
+      </div>
+    ),
+    addressMember: <div className="addressCell">{member.addressMember}</div>,
+    guildName: <GuildName guildId={Number(member.guildId)} />,
+    action: <button className="updateBtn">Update</button>,
+  }));
 
   return (
     <div className={`custom-theme-container ${styles.tableWrapper}`}>
