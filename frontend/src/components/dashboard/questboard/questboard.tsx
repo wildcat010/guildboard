@@ -2,13 +2,25 @@
 
 import styles from "./questboard.module.css";
 import { useEffect, useState } from "react";
-import { Section } from "./../../../constants/constants";
+import { Section, Task } from "./../../../constants/constants";
 
 import AddTaskModal from "./addTaskModal/addTaskModal";
+import { useTask } from "@/hooks/useTask";
+import TaskCard from "./taskCard/taskCard";
 
 export default function Questboard() {
   const [showModalGuild, setShowModalGuild] = useState(false);
   const [showModalTask, setShowModalTask] = useState(false);
+
+  const { getAllTasks, refetchAllTasks } = useTask();
+  const allTasksUnassigned =
+    (getAllTasks as Task[])?.filter(
+      (task: Task) => Number(task.guildId) == 0,
+    ) ?? [];
+  const allTasksAssigned =
+    (getAllTasks as Task[])?.filter(
+      (task: Task) => Number(task.guildId) != 0,
+    ) ?? [];
 
   return (
     <div className={styles.content}>
@@ -41,8 +53,27 @@ export default function Questboard() {
           </button>
         </div>
       </div>
+      <div className={styles.pageTitle}>
+        Unassigned - {allTasksUnassigned.length}
+      </div>
+      <div className={styles.pageTasks}>
+        {allTasksUnassigned.map((task: Task) => (
+          <TaskCard key={task.id.toString()} task={task}></TaskCard>
+        ))}
+      </div>
+      <div className={styles.pageTitle}>
+        Assigned - {allTasksAssigned.length}
+      </div>
+      <div className={styles.pageTasks}>
+        {allTasksAssigned.map((task: Task) => (
+          <TaskCard key={task.id.toString()} task={task}></TaskCard>
+        ))}
+      </div>
       {showModalTask && (
-        <AddTaskModal onClose={() => setShowModalTask(false)} />
+        <AddTaskModal
+          onClose={() => setShowModalTask(false)}
+          refetchAllTasks={refetchAllTasks}
+        />
       )}
     </div>
   );

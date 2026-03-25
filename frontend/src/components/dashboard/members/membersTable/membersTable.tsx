@@ -9,6 +9,7 @@ import { useGuildById } from "@/hooks/useGuildById";
 
 import "simple-table-core/styles.css";
 import "./CustomTheme.css";
+import MemberModal from "../../memberModal/memberModal";
 
 const headers = [
   { accessor: "id", label: "ID", width: 60 },
@@ -25,10 +26,20 @@ function GuildName({ guildId }: { guildId: number }) {
 }
 
 export default function MembersTable() {
-  const { getAllMembers } = useMember();
-  const membersArray = (getAllMembers as Member[]) ?? [];
+  const { getAllMembers, refetchMember } = useMember();
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [members, setMembers] = useState<Member[]>([]);
 
-  const rows = membersArray.map((member) => ({
+  useEffect(() => {
+    setMembers((getAllMembers as Member[]) ?? []);
+  }, [getAllMembers]);
+
+  const handleDeleteSuccess = (deletedId: number) => {
+    setMembers((prev) => prev.filter((m) => Number(m.id) !== deletedId));
+    setSelectedMember(null);
+  };
+
+  const rows = members.map((member) => ({
     id: Number(member.id),
     user: (
       <div className="userCell">
@@ -38,11 +49,28 @@ export default function MembersTable() {
     ),
     addressMember: <div className="addressCell">{member.addressMember}</div>,
     guildName: <GuildName guildId={Number(member.guildId)} />,
-    action: <button className="updateBtn">Update</button>,
+    action: (
+      <button
+        className="updateBtn"
+        onClick={() => {
+          setSelectedMember(member);
+        }}
+      >
+        Update
+      </button>
+    ),
   }));
 
   return (
     <div className={`custom-theme-container ${styles.tableWrapper}`}>
+      {selectedMember && (
+        <MemberModal
+          member={selectedMember}
+          refetchMember={refetchMember}
+          onClose={() => setSelectedMember(null)}
+          onDeleteSuccess={() => handleDeleteSuccess(Number(selectedMember.id))}
+        />
+      )}
       <SimpleTable
         defaultHeaders={headers}
         rows={rows}

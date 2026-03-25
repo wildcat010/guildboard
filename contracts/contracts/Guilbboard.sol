@@ -39,6 +39,7 @@ Initializable
 
     struct Task {
         uint256 id;
+        string name;
         string description;
         TaskStatus status;
         address poster;    // who created the task
@@ -91,17 +92,18 @@ Initializable
         _disableInitializers(); 
     }
 
-    function createTask(string memory description, address payable assigneeAddress) external payable onlyOwner{
+    function createTask(string memory name, string memory description, uint256 reward) external payable onlyOwner{
         tasksCreated++;
 
         _TaskIDs[tasksCreated] = Task({
            id: tasksCreated,
+           name: name,
             description: description,
             status: TaskStatus.toDo,
             poster: msg.sender,
-            assignee: assigneeAddress,
+            assignee:  payable(address(0)),
             guildId: 0,
-            reward: msg.value,
+            reward: reward,
             paid: false
         });
 
@@ -158,8 +160,27 @@ Initializable
         emit TaskDoneAndPaid(taskId, myTask.reward, myTask.guildId);
     }
 
-    function AssignTaskToGuild(uint256 guildId, uint256 taskId) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused {
+
+    function _removeTask(uint256 guildId, uint256 taskId) internal {
+    uint256[] storage arr = _guildTasks[guildId];
+
+    for (uint256 i = 0; i < arr.length; i++) {
+        if (arr[i] == taskId) {
+            arr[i] = arr[arr.length - 1];
+            arr.pop();
+            break;
+        }
+    }
+}
+
+    function AssignTaskToGuild(uint256 guildId, uint256 taskId, address payable payableAddress ) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused {
        Task storage myTask = _TaskIDs[taskId];
+       myTask.assignee = payableAddress;
+
+    if(myTask.guildId != 0){
+        _removeTask(myTask.guildId, taskId);
+    }
+
        myTask.guildId = guildId;
        _guildTasks[guildId].push(taskId);
        emit TaskAssigned(taskId,guildId);

@@ -52,3 +52,10 @@
   flex-direction: column;
   gap: 5px;
 }
+
+.pageTasks {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: wrap;
+}

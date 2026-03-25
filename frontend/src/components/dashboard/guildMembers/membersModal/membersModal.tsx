@@ -68,13 +68,6 @@ export default function MembersModal({
           </div>
         </div>
 
-        <button
-          className="btn-primary"
-          style={{ width: "100%", padding: "12px" }}
-        >
-          ⟶ Deploy Quest On-Chain
-        </button>
-
         <div
           className={styles.toggleContainer}
           onClick={!isStatusGuildPending ? clickStatus : undefined}

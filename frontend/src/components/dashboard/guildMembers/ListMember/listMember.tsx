@@ -23,6 +23,7 @@ export default function ListMember({ memberId }: ListMemberProps) {
           member={member}
           refetchMember={refetchMember}
           onClose={() => setMemberModal(false)}
+          onDeleteSuccess={() => {}}
         />
       )}
       <div

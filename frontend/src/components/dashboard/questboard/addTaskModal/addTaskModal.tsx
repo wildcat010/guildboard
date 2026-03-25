@@ -1,13 +1,40 @@
 "use client";
+import { useTask } from "@/hooks/useTask";
 import styles from "./addTaskModal.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useTaskManagement } from "@/hooks/useTaskManagement";
+import { parseUnits } from "ethers";
 
 type AddTaskModalProps = {
   onClose: () => void;
+  refetchAllTasks: () => void;
 };
 
-export default function AddTaskModal({ onClose }: AddTaskModalProps) {
+export default function AddTaskModal({
+  onClose,
+  refetchAllTasks,
+}: AddTaskModalProps) {
   const [taskName, setTaskName] = useState("");
+  const [description, setDescription] = useState("");
+  const [reward, setReward] = useState("");
+  const { isTaskPending, isTaskSuccess, isTaskError, createTask } =
+    useTaskManagement();
+
+  useEffect(() => {
+    if (isTaskSuccess) {
+      refetchAllTasks();
+      onClose();
+    }
+  }, [isTaskSuccess]);
+
+  function handleSubmit() {
+    if (isTaskSuccess) {
+      onClose();
+      return;
+    }
+    if (!taskName.trim() || Number(reward) == 0) return;
+    createTask(taskName, description, parseUnits(reward, "gwei"));
+  }
 
   return (
     <>
@@ -24,6 +51,29 @@ export default function AddTaskModal({ onClose }: AddTaskModalProps) {
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
             />
+          </div>
+          <div className={styles.modalBody}>
+            <label>Description</label>
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div className={styles.modalBody}>
+            <label>Reward in GWEI</label>
+            <input
+              type="number"
+              placeholder="e.g. 100000000 (GWEI) - 0.1 ETH"
+              value={reward}
+              onChange={(e) => setReward(e.target.value)}
+            />
+          </div>
+          <div className={styles.modalFooter}>
+            <button onClick={onClose}>Cancel</button>
+            <button onClick={handleSubmit} disabled={isTaskPending}>
+              {isTaskPending ? "Creating..." : "Create Task"}
+            </button>
           </div>
         </div>
       </div>

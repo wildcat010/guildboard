@@ -2,6 +2,7 @@ import { Guildboard, GuildNFT, GuildNFT__factory } from "../typechain-types";
 import { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { expect } from "chai";
 import hre from "hardhat";
+import { parseEther } from "ethers";
 
 // =========================================
 // VARIABLES — shared across all tests
@@ -79,13 +80,15 @@ describe("Guildboard contract config", function () {
   });
 
   it("should create a task", async () => {
-    await expect(guildboard.createTask("test task", otherAccount))
+    await expect(
+      guildboard.createTask("task 1", "test task", parseEther("0.1")),
+    )
       .to.emit(guildboard, "TaskCreated")
       .withArgs(1);
   });
 
   it("should change the status of a task", async () => {
-    await guildboard.createTask("test task", otherAccount);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
     await expect(guildboard.updateTaskStatus(1, 2))
       .to.emit(guildboard, "TaskStatusUpdated")
@@ -103,13 +106,15 @@ describe("Task management", function () {
   });
 
   it("should create a task", async () => {
-    await expect(guildboard.createTask("test task", otherAccount))
+    await expect(
+      guildboard.createTask("task 1", "test task", parseEther("0.1")),
+    )
       .to.emit(guildboard, "TaskCreated")
       .withArgs(1);
   });
 
   it("should change the status of a task", async () => {
-    await guildboard.createTask("test task", otherAccount);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
     await expect(guildboard.updateTaskStatus(1, 2))
       .to.emit(guildboard, "TaskStatusUpdated")
@@ -121,7 +126,7 @@ describe("Task management", function () {
   });
 
   it("should not change the status of a task because the contract is shutdown", async () => {
-    await guildboard.createTask("test task", otherAccount);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
     await guildboard.enableShutdown();
 
@@ -134,27 +139,27 @@ describe("Task management", function () {
   });
 
   it("should assign a task to a guild", async () => {
-    await guildboard.createTask("test task", otherAccount);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
     await guildNFT.createGuild("guild Test");
 
     const task = await guildboard.getTask(1);
     expect(task.guildId).to.equal(0);
 
-    await guildboard.AssignTaskToGuild(1, 1);
+    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
 
     const taskUpdated = await guildboard.getTask(1);
     expect(taskUpdated.guildId).to.equal(1);
   });
 
   it("should not assign a task to a guild which not exist", async () => {
-    await guildboard.createTask("test task", otherAccount);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
     const task = await guildboard.getTask(1);
     expect(task.guildId).to.equal(0);
 
-    await expect(guildboard.AssignTaskToGuild(1, 1)).to.be.revertedWith(
-      "GuildNFT: guild does not exist",
-    );
+    await expect(
+      guildboard.AssignTaskToGuild(1, 1, otherAccount),
+    ).to.be.revertedWith("GuildNFT: guild does not exist");
   });
 
   it("should deposit an amount of ETH on the contract", async () => {
@@ -180,7 +185,9 @@ describe("Task management", function () {
 
     await guildNFT.createGuild("guild Test");
 
-    await guildboard.createTask("test task", otherAccount.address, {
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
+
+    await guildboard.deposit({
       value: hre.ethers.parseEther("0.1"),
     });
 
@@ -191,7 +198,7 @@ describe("Task management", function () {
 
     await guildboard.updateTaskStatus(1, 3);
 
-    await guildboard.AssignTaskToGuild(1, 1);
+    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
 
     await expect(guildboard.closeAndPayTask(1))
       .to.emit(guildboard, "TaskDoneAndPaid")
@@ -205,10 +212,8 @@ describe("Task management", function () {
 
   it("should verfied a task and not pay the assignee because we are not the owner", async () => {
     await guildNFT.createGuild("guild Test");
-    await guildboard.createTask("test task", otherAccount.address, {
-      value: hre.ethers.parseEther("0.1"),
-    });
-    await guildboard.AssignTaskToGuild(1, 1);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
+    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
     await guildboard.updateTaskStatus(1, 3);
 
     await expect(guildboard.connect(otherAccount).closeAndPayTask(1))
@@ -218,14 +223,10 @@ describe("Task management", function () {
 
   it("should return all the tasks for a guild", async () => {
     await guildNFT.createGuild("guild Test");
-    await guildboard.createTask("test task 1", otherAccount.address, {
-      value: hre.ethers.parseEther("0.1"),
-    });
-    await guildboard.createTask("test task 2", otherAccount.address, {
-      value: hre.ethers.parseEther("0.1"),
-    });
-    await guildboard.AssignTaskToGuild(1, 1);
-    await guildboard.AssignTaskToGuild(1, 2);
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
+    await guildboard.createTask("task 2", "test task", parseEther("0.1"));
+    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
+    await guildboard.AssignTaskToGuild(1, 2, otherAccount2);
 
     const task = await guildboard.getGuildTasks(1);
     expect(task.length).to.equal(2);
@@ -235,17 +236,11 @@ describe("Task management", function () {
 
   it("should return all the tasks created", async () => {
     await guildNFT.createGuild("guild Test");
-    await guildboard.createTask("test task 1", otherAccount.address, {
-      value: hre.ethers.parseEther("0.1"),
-    });
-    await guildboard.createTask("test task 2", otherAccount.address, {
-      value: hre.ethers.parseEther("0.1"),
-    });
-    await guildboard.createTask("test task 3", otherAccount.address, {
-      value: hre.ethers.parseEther("0.1"),
-    });
+    await guildboard.createTask("task 1", "test task", parseEther("0.1"));
+    await guildboard.createTask("task 2", "test task", parseEther("0.1"));
+    await guildboard.createTask("task 3", "test task", parseEther("0.1"));
 
-    await guildboard.AssignTaskToGuild(1, 1);
+    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
 
     const task = await guildboard.getAllTasks();
     expect(task.length).to.equal(3);

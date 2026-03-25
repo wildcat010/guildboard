@@ -9,6 +9,24 @@ export const guildState: Record<number, string> = {
   1: "Active",
   2: "Inactive",
 };
+export const taskStatus: Record<number, string> = {
+  0: "toDo",
+  1: "inProgress",
+  2: "Done",
+  3: "Verified",
+  4: "Close",
+};
+
+export type Task = {
+  id: bigint;
+  description: string;
+  status: number;
+  poster: string; // who created the task
+  assignee: string; // who does the task and gets paid
+  guildId: bigint;
+  reward: bigint; // ← ETH in escrow
+  paid: boolean; // ← prevent double payment
+};
 
 export type Guild = {
   id: bigint;

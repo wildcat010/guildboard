@@ -12,12 +12,14 @@ type MemberModalProps = {
   onClose: () => void;
   member: Member;
   refetchMember: () => void;
+  onDeleteSuccess: () => void;
 };
 
 export default function MemberModal({
   onClose,
   member,
   refetchMember,
+  onDeleteSuccess,
 }: MemberModalProps) {
   const [selectedRole, setSelectedRole] = useState(Number(member.role));
 
@@ -55,9 +57,16 @@ export default function MemberModal({
       pendingClose.current = false;
       refetchGuilds();
       refetchGuildMembers();
+      onDeleteSuccess();
       onClose();
     }
-  }, [isRemoveMemberSuccess, refetchGuilds, refetchGuildMembers, onClose]);
+  }, [
+    isRemoveMemberSuccess,
+    refetchGuilds,
+    refetchGuildMembers,
+    onClose,
+    onDeleteSuccess,
+  ]);
 
   useEffect(() => {
     if (isUpgradingSuccess) {

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useGuild } from "@/hooks/useGuild";
 import { useManagementGuild } from "@/hooks/useManagementGuilds";
 import { PinataSDK } from "pinata";
+import { useMember } from "@/hooks/useMember";
 
 const pinata = new PinataSDK({
   pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT!,
@@ -27,6 +28,7 @@ export default function MembersModal({ onClose }: MembersModalProps) {
 
   const { mintMember, isMemberPending, isMemberSuccess, isMemberError } =
     useManagementGuild();
+  const { refetchAllMember } = useMember();
 
   const { guilds } = useGuild();
   const guildsArray =
@@ -35,6 +37,7 @@ export default function MembersModal({ onClose }: MembersModalProps) {
   useEffect(() => {
     if (isMemberSuccess && pendingClose.current) {
       pendingClose.current = false;
+      refetchAllMember();
       onClose();
     }
   }, [isMemberSuccess, onClose]);
