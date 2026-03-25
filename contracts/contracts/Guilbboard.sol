@@ -92,7 +92,7 @@ Initializable
         _disableInitializers(); 
     }
 
-    function createTask(string memory name, string memory description, uint256 reward) external payable onlyOwner{
+    function createTask(string memory name, string memory description, uint256 reward) external onlyOwner{
         tasksCreated++;
 
         _TaskIDs[tasksCreated] = Task({

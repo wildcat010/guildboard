@@ -4,6 +4,7 @@ import styles from "./taskCard.module.css";
 import { useState, useEffect } from "react";
 import { useTaskManagement } from "@/hooks/useTaskManagement";
 import { Task, taskStatus } from "@/constants/constants";
+import { formatEther } from "ethers";
 
 type TaskCardModalProps = {
   task: Task;
@@ -32,7 +33,9 @@ export default function TaskCard({ task }: TaskCardModalProps) {
         </div>
 
         <div className={styles.taskFooter}>
-          <div className={styles.taskReward}>{task.reward} ETH</div>
+          <div className={styles.taskReward}>
+            {formatEther(task.reward)} ETH
+          </div>
         </div>
       </div>
     </>
