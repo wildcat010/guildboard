@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useTaskManagement } from "@/hooks/useTaskManagement";
 import { Task, taskStatus } from "@/constants/constants";
 import { formatEther } from "ethers";
+import TaskModal from "../taskModal/taskModal";
 
 type TaskCardModalProps = {
   task: Task;
@@ -38,6 +39,9 @@ export default function TaskCard({ task }: TaskCardModalProps) {
           </div>
         </div>
       </div>
+      {showModal && (
+        <TaskModal task={task} onClose={() => setShowModal(false)}></TaskModal>
+      )}
     </>
   );
 }

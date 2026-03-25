@@ -19,6 +19,7 @@ export const taskStatus: Record<number, string> = {
 
 export type Task = {
   id: bigint;
+  name: string;
   description: string;
   status: number;
   poster: string; // who created the task
