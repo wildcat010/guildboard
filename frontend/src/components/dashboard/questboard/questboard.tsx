@@ -58,7 +58,11 @@ export default function Questboard() {
       </div>
       <div className={styles.pageTasks}>
         {allTasksUnassigned.map((task: Task) => (
-          <TaskCard key={task.id.toString()} task={task}></TaskCard>
+          <TaskCard
+            key={task.id.toString()}
+            task={task}
+            refetchAllTasks={refetchAllTasks}
+          ></TaskCard>
         ))}
       </div>
       <div className={styles.pageTitle}>
@@ -66,7 +70,11 @@ export default function Questboard() {
       </div>
       <div className={styles.pageTasks}>
         {allTasksAssigned.map((task: Task) => (
-          <TaskCard key={task.id.toString()} task={task}></TaskCard>
+          <TaskCard
+            key={task.id.toString()}
+            task={task}
+            refetchAllTasks={refetchAllTasks}
+          ></TaskCard>
         ))}
       </div>
       {showModalTask && (

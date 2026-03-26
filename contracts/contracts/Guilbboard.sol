@@ -65,6 +65,7 @@ Initializable
     // EVENTS
     // =========================================
     event TaskCreated(uint256 taskId);
+    event TaskUpdated(uint256 taskId);
     event TaskAssigned(uint256 taskId,  uint256 guildId);
     event TaskDoneAndPaid(uint256 taskId,  uint256 amount, uint256 guildId);
     event TaskStatusUpdated(uint256 taskId, TaskStatus newStatus);
@@ -134,6 +135,20 @@ Initializable
 
     function getTask(uint256 taskId) external view taskExists(taskId) returns(Task memory) {
         return _TaskIDs[taskId];
+    }
+
+    function updateTask(uint256 taskId, string memory name, string memory description, uint256 reward, uint256 guildId) external onlyOwner taskExists(taskId) whenNotPaused
+    {
+        Task storage myTask = _TaskIDs[taskId];
+        require(!myTask.paid, "GuildBoard: task already paid");
+        require(myTask.status != TaskStatus.Close, "GuildBoard: task is closed");
+       
+        myTask.name = name;
+        myTask.description = description;
+        myTask.reward = reward;
+        myTask.guildId = guildId;
+        
+        emit TaskUpdated(taskId);
     }
 
     function updateTaskStatus(uint256 taskId, TaskStatus newStatus) external onlyOwner taskExists(taskId) whenNotPaused

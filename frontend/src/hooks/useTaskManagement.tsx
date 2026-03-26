@@ -10,12 +10,19 @@ export function useTaskManagement() {
     isPending: isTaskPending,
     isSuccess: isTaskSuccess,
     isError: isTaskError,
-    error: taskError,
+  } = useWriteContract();
+
+  const {
+    writeContract: writeUpdateTask,
+    isPending: isTaskUpdatePending,
+    isSuccess: isTaskUpdateSuccess,
+    isError: isTaskUpdateError,
+    error: taskUpdateError,
   } = useWriteContract();
 
   useEffect(() => {
-    if (taskError) console.error("createTask error:", taskError);
-  }, [taskError]);
+    if (taskUpdateError) console.error("updateTask error:", taskUpdateError);
+  }, [taskUpdateError]);
 
   function createTask(name: string, description: string, reward: bigint) {
     writeTask({
@@ -26,10 +33,29 @@ export function useTaskManagement() {
     });
   }
 
+  function updateTask(
+    taskId: bigint,
+    name: string,
+    description: string,
+    reward: bigint,
+    guildId: bigint,
+  ) {
+    writeUpdateTask({
+      address: GUILDBOARD_ADDRESS,
+      abi: GUILDBOARD_ABI,
+      functionName: "updateTask",
+      args: [taskId, name, description, reward, guildId],
+    });
+  }
+
   return {
     isTaskPending,
     isTaskSuccess,
     isTaskError,
     createTask,
+    isTaskUpdatePending,
+    isTaskUpdateSuccess,
+    isTaskUpdateError,
+    updateTask,
   };
 }

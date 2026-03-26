@@ -10,18 +10,57 @@ import { useGuild } from "@/hooks/useGuild";
 type TaskCardModalProps = {
   task: Task;
   onClose: () => void;
+  refetchAllTasks: () => void;
 };
 
-export default function TaskModal({ task, onClose }: TaskCardModalProps) {
-  const [status, setStatus] = useState(task.status);
+export default function TaskModal({
+  task,
+  onClose,
+  refetchAllTasks,
+}: TaskCardModalProps) {
+  const [myTask, setMyTask] = useState(task);
 
-  const [guildSelect, setGuildSelect] = useState(task.guildId);
-  const [description, setDescription] = useState(task.description);
-  const [reward, setReward] = useState(formatEther(task.reward));
+  const [editedTask, setEditedTask] = useState({
+    description: task.description,
+    reward: formatEther(task.reward),
+    guildId: task.guildId,
+    status: task.status,
+  });
+
+  const hasChanges =
+    editedTask.description !== task.description ||
+    editedTask.reward !== formatEther(task.reward) ||
+    editedTask.guildId !== task.guildId;
+
+  const {
+    isTaskUpdatePending,
+    isTaskUpdateSuccess,
+    isTaskUpdateError,
+    updateTask,
+  } = useTaskManagement();
 
   const { guilds } = useGuild();
   const guildsArray =
     (guilds as Guild[]).filter((guild) => guild.active == true) ?? [];
+
+  const handleUpgrade = () => {
+    console.log("handleUpgrade");
+    updateTask(
+      task.id,
+      myTask.name,
+      editedTask.description,
+      parseEther(editedTask.reward),
+      editedTask.guildId,
+    );
+    console.log("handleUpgrade end");
+  };
+
+  useEffect(() => {
+    if (isTaskUpdateSuccess) {
+      refetchAllTasks();
+      onClose();
+    }
+  }, [isTaskUpdateSuccess]);
 
   return (
     <div className={styles.modalOverlay}>
@@ -35,8 +74,10 @@ export default function TaskModal({ task, onClose }: TaskCardModalProps) {
           <span className={styles.formLabel}>Description</span>
           <textarea
             className={styles.descriptionArea}
-            value={task.description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={editedTask.description}
+            onChange={(e) =>
+              setEditedTask({ ...editedTask, description: e.target.value })
+            }
           />
         </div>
         <div className={styles.formGroup}>
@@ -44,16 +85,20 @@ export default function TaskModal({ task, onClose }: TaskCardModalProps) {
           <input
             className={styles.rewardInput}
             type="number"
-            value={reward}
-            onChange={(e) => setReward(e.target.value)}
+            value={editedTask.reward}
+            onChange={(e) =>
+              setEditedTask({ ...editedTask, reward: e.target.value })
+            }
           />
         </div>
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>Status - {task.status}</span>
+          <span className={styles.formLabel}>Guild - #{task.guildId}</span>
           <select
             className={styles.statusSelect}
-            value={guildSelect.toString()}
-            onChange={(e) => setGuildSelect(BigInt(e.target.value))}
+            value={editedTask.guildId.toString()}
+            onChange={(e) =>
+              setEditedTask({ ...editedTask, guildId: BigInt(e.target.value) })
+            }
           >
             <option key={0} value={0}>
               {"NA"}
@@ -67,32 +112,22 @@ export default function TaskModal({ task, onClose }: TaskCardModalProps) {
         </div>
 
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>Status - {task.status}</span>
-          <select
-            className={styles.statusSelect}
-            value={status}
-            onChange={(e) => setStatus(Number(e.target.value))}
-          >
-            {Object.entries(taskStatus).map(([key, label]) => (
-              <option key={key} value={key}>
-                {label}
-              </option>
-            ))}
-          </select>
+          <span className={styles.formLabel}>Status - #{task.status}</span>
+          <p>{taskStatus[task.status]}</p>
         </div>
-        <div className={styles.modalFooter}>
-          <button className={styles.cancelButton} onClick={onClose}>
-            Cancel
-          </button>
-          <button
-            className={styles.saveButton}
-            onClick={() => {
-              // hook calls will go here
-              console.log({ description, reward: parseEther(reward), status });
-            }}
-          >
-            Save
-          </button>
+        <div className={styles.formGroup}>
+          <span className={styles.formLabel}>Actions</span>
+          <div className={styles.container}>
+            {hasChanges && (
+              <button
+                className={styles.button}
+                onClick={handleUpgrade}
+                disabled={isTaskUpdatePending}
+              >
+                {isTaskUpdatePending ? "⬆ Upgrading..." : "⬆ Upgrade"}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

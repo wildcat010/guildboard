@@ -9,9 +9,13 @@ import TaskModal from "../taskModal/taskModal";
 
 type TaskCardModalProps = {
   task: Task;
+  refetchAllTasks: () => void;
 };
 
-export default function TaskCard({ task }: TaskCardModalProps) {
+export default function TaskCard({
+  task,
+  refetchAllTasks,
+}: TaskCardModalProps) {
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -40,7 +44,11 @@ export default function TaskCard({ task }: TaskCardModalProps) {
         </div>
       </div>
       {showModal && (
-        <TaskModal task={task} onClose={() => setShowModal(false)}></TaskModal>
+        <TaskModal
+          task={task}
+          refetchAllTasks={refetchAllTasks}
+          onClose={() => setShowModal(false)}
+        ></TaskModal>
       )}
     </>
   );

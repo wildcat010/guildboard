@@ -211,3 +211,15 @@
   padding: 6px 8px;
   outline: none;
 }
+
+.button {
+  cursor: pointer;
+  background: #c9a84c0a;
+  border: 1px solid #c9a84c33;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 10px;
+  transition: all 0.2s;
+  display: flex;
+}
