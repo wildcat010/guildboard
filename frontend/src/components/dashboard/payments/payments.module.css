@@ -28,6 +28,17 @@
   margin-top: 4px;
 }
 
+.buttonWraper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.text {
+  color: #fff;
+  font-size: 11px;
+}
+
 .btnPrimary {
   padding: 10px 24px;
   background: linear-gradient(135deg, #7a6030, #5a4520);
