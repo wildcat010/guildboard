@@ -43,6 +43,7 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
     mapping(uint256 => Member) private _members;
     mapping(uint256 => Guild) private _guilds;
     mapping(uint256 => uint256[]) private _guildMembers; // guildId → list of member IDs
+    mapping(address => uint256) private _memberIdByAddress;
 
     // =========================================
     // EVENTS
@@ -110,6 +111,7 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
         uint256 deletedMembers = 0;
         for (uint256 i = 0; i < guildMembers.length; i++) {
             _burn(guildMembers[i]);
+            delete _memberIdByAddress[addr];  
             delete _members[guildMembers[i]];
             _memberCounter--;
             deletedMembers++;
@@ -210,8 +212,15 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
         });
 
         _guildMembers[guildId].push(_memberIdCounter);
+        _memberIdByAddress[to] = _memberIdCounter;
         emit MemberMinted(_memberIdCounter, guildId);
     }
+
+    function getMemberByAddress(address user) external view returns (Member memory) {
+    uint256 memberId = _memberIdByAddress[user];
+    require(memberId != 0, "GuildNFT: member not found");
+    return _members[memberId];
+}
 
     function removeGuildMember(uint256 memberId) external onlyOwner memberExists(memberId) {
         uint256 guildId = _members[memberId].guildId;
@@ -225,8 +234,11 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
             }
         }
 
+         delete _memberIdByAddress[_members[memberId].addressMember];
+
         _burn(memberId);
         delete _members[memberId];
+       
         _memberCounter--;
 
         emit MemberRemoved(memberId, guildId);

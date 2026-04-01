@@ -168,7 +168,7 @@ describe("Task management", function () {
     );
     expect(balance).to.equal(hre.ethers.parseEther("0"));
 
-    await guildboard.deposit({
+    await guildboard.deposit("deposit 1", "01/01/2026", {
       value: hre.ethers.parseEther("0.01"),
     });
     const newBalance = await hre.ethers.provider.getBalance(
@@ -187,7 +187,7 @@ describe("Task management", function () {
 
     await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
-    await guildboard.deposit({
+    await guildboard.deposit("deposit 1", "01/01/2026", {
       value: hre.ethers.parseEther("0.1"),
     });
 
@@ -247,5 +247,60 @@ describe("Task management", function () {
     expect(task[0].guildId).to.equal(1);
     expect(task[1].guildId).to.equal(0);
     expect(task[2].guildId).to.equal(0);
+  });
+});
+
+describe("Deposit management", function () {
+  beforeEach(async function () {
+    ({ guildboard, guildNFT, owner, otherAccount } = await initContract());
+  });
+
+  it("should make a deposit and add money in the smart contract", async () => {
+    await expect(
+      guildboard.deposit("Deposit 1", "01/01/2026", {
+        value: hre.ethers.parseEther("0.01"),
+      }),
+    )
+      .to.emit(guildboard, "Deposited")
+      .withArgs(1, hre.ethers.parseEther("0.01"));
+
+    const balance = await hre.ethers.provider.getBalance(
+      await guildboard.getAddress(),
+    );
+
+    expect(balance).to.equal(hre.ethers.parseEther("0.01"));
+  });
+
+  it("should make two deposits and return all of them", async () => {
+    let balance: bigint = 0n;
+
+    await guildboard.deposit("Deposit 1", "01/01/2026", {
+      value: hre.ethers.parseEther("0.01"),
+    });
+    balance = await hre.ethers.provider.getBalance(
+      await guildboard.getAddress(),
+    );
+    expect(balance).to.equal(hre.ethers.parseEther("0.01"));
+
+    await guildboard.deposit("Deposit 2", "02/01/2026", {
+      value: hre.ethers.parseEther("0.02"),
+    });
+    balance = await hre.ethers.provider.getBalance(
+      await guildboard.getAddress(),
+    );
+    expect(balance).to.equal(hre.ethers.parseEther("0.03"));
+
+    const deposits = await guildboard.getAllDeposits();
+
+    expect(deposits.length).to.equal(2);
+    expect(deposits[0].id).to.equal(1n);
+    expect(deposits[0].name).to.equal("Deposit 1");
+    expect(deposits[0].date).to.equal("01/01/2026");
+    expect(deposits[0].amount).to.equal(hre.ethers.parseEther("0.01"));
+
+    expect(deposits[1].id).to.equal(2n);
+    expect(deposits[1].name).to.equal("Deposit 2");
+    expect(deposits[1].date).to.equal("02/01/2026");
+    expect(deposits[1].amount).to.equal(hre.ethers.parseEther("0.02"));
   });
 });

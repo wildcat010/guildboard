@@ -25,6 +25,12 @@ export default function Sidebar({
           Navigation
         </div>
         <button
+          className={`${styles.sidebarItem} ${activeSection === "myGuild" ? styles.active : ""}`}
+          onClick={() => onSectionChange("myGuild")}
+        >
+          <span className="icon">📋</span> My Guild
+        </button>
+        <button
           className={`${styles.sidebarItem} ${activeSection === "questboard" ? styles.active : ""}`}
           onClick={() => onSectionChange("questboard")}
         >

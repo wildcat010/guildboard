@@ -1,0 +1,74 @@
+.custom-theme-container {
+  --st-bg-color: transparent;
+  --st-header-bg-color: transparent;
+
+  --st-row-bg-color: transparent;
+  --st-row-alt-bg-color: transparent;
+  --st-row-hover-bg-color: transparent;
+
+  --st-border-color: rgba(201, 168, 76, 0.2);
+
+  --st-header-text-color: #a0845c;
+  --st-cell-text-color: #e5e7eb;
+
+  --st-font-family: "Share Tech Mono", monospace;
+  --st-font-size: 13px;
+  --st-letter-spacing: 1px;
+}
+
+/* 🔥 HEADER = minimal like modal */
+.custom-theme-container .st-header {
+  border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+  margin-bottom: 10px;
+}
+
+.custom-theme-container .st-header-cell {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #c8cdd8;
+}
+
+/* 💎 ROW = CARD STYLE */
+.custom-theme-container .st-row {
+  background: rgba(13, 16, 24, 0.8);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  margin-bottom: 10px;
+  border-radius: 6px;
+  padding: 10px 8px;
+  transition: all 0.25s ease;
+}
+
+/* ✨ hover like your UI */
+.custom-theme-container .st-row:hover {
+  border-color: #c9a84c;
+  box-shadow: 0 0 10px rgba(201, 168, 76, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 🧱 remove default grid lines */
+.custom-theme-container .st-cell {
+  border: none !important;
+}
+
+/* ✨ ID column = dim */
+.custom-theme-container .st-cell:nth-child(1) {
+  color: #6b7280;
+}
+
+/* 💼 ROLE = gold accent */
+.custom-theme-container .st-cell:nth-child(4) {
+  color: #f0d080;
+  font-weight: 600;
+}
+
+/* 📦 ADDRESS = truncate look */
+.custom-theme-container .st-cell:nth-child(3) {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* spacing between rows */
+.custom-theme-container .st-body {
+  padding: 6px;
+}

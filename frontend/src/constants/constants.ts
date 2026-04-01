@@ -44,10 +44,18 @@ export type Member = {
   uri: string;
 };
 
+export type Depo = {
+  id: bigint;
+  name: string;
+  date: string;
+  amount: bigint;
+};
+
 export type Section =
   | "questboard"
   | "guildMembers"
   | "members"
   | "payments"
   | "mynft"
+  | "myGuild"
   | "settings";

@@ -49,12 +49,20 @@ Initializable
         bool paid;       // ← prevent double payment
     }
 
+    struct Depo {
+        uint256 id;
+        string name;
+        string date;
+        uint256 amount;
+    }
+
     mapping(uint256 => uint256[]) public _guildTasks; // ID guild -> tasks
     mapping(uint256 => uint256) public _guildPayements; //ID guild -> total payments received
-
+    mapping(uint256 => Depo) public deposits;
     mapping(uint256 => Task) _TaskIDs;
 
     uint256 private tasksCreated;
+    uint256 private totalDeposited;
 
     // =========================================
     // STATE VARIABLES
@@ -69,6 +77,7 @@ Initializable
     event TaskAssigned(uint256 taskId,  uint256 guildId);
     event TaskDoneAndPaid(uint256 taskId,  uint256 amount, uint256 guildId);
     event TaskStatusUpdated(uint256 taskId, TaskStatus newStatus);
+    event Deposited(uint256 depositId, uint256 amount);
 
 
      // =========================================
@@ -158,7 +167,29 @@ Initializable
         emit TaskStatusUpdated(taskId, newStatus);
     }
 
-    function deposit() external payable {}
+    function getAllDeposits() external view returns(Depo[] memory){
+        Depo[] memory depo = new Depo[](totalDeposited);
+        for(uint256 i = 1; i <= totalDeposited; i++) 
+        {
+                depo[i-1] = deposits[i];
+        }
+        return depo;
+    }
+
+    function deposit(string memory name,string memory date) external payable onlyOwner{
+        require(msg.value > 0, "GuildBoard: must send ETH");
+        totalDeposited++;
+
+        deposits[totalDeposited] = Depo({
+            id: totalDeposited,
+            name: name,
+            date: date,
+            amount: msg.value
+        });
+        
+        emit Deposited(totalDeposited, msg.value);
+    }
+
 
     function closeAndPayTask(uint256 taskId) external onlyOwner taskExists(taskId) nonReentrant whenNotPaused
     {

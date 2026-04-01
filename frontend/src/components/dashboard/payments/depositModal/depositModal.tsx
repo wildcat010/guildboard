@@ -6,17 +6,23 @@ import { useBalance } from "wagmi";
 type MembeDepositModalProps = {
   onClose: () => void;
   refetchBalance: () => void;
+  onDepositSuccess: () => void;
 };
 
 export function DepositModal({
   onClose,
   refetchBalance,
+  onDepositSuccess,
 }: MembeDepositModalProps) {
   const [depositAmount, setDepositAmount] = useState(0);
+  const [name, setName] = useState("");
+  const [date, setDate] = useState("");
   const { deposit, isDepositPending, isDepositSuccess } = useDeposit();
 
   useEffect(() => {
     if (isDepositSuccess) {
+      refetchBalance();
+      onDepositSuccess(); // ✅ refetch table
       onClose();
     }
   }, [isDepositSuccess]);
@@ -28,7 +34,7 @@ export function DepositModal({
       return;
     }
 
-    deposit(depositAmount.toString());
+    deposit(name, date, depositAmount.toString());
   };
 
   return (
@@ -38,6 +44,23 @@ export function DepositModal({
           <div className={styles.modalHeader}>
             <h2>Add Guild</h2>
             <button onClick={onClose}>✕</button>
+          </div>
+          <div className={styles.modalBody}>
+            <label>Name Deposit</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className={styles.modalBody}>
+            <label>Date Deposit</label>
+            <input
+              type="text"
+              value={date}
+              placeholder="01/01/2025"
+              onChange={(e) => setDate(e.target.value)}
+            />
           </div>
           <div className={styles.modalBody}>
             <label>Deposit Amount in ETH</label>
