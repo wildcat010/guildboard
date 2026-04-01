@@ -110,6 +110,8 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
         uint256[] storage guildMembers = _guildMembers[guildId];
         uint256 deletedMembers = 0;
         for (uint256 i = 0; i < guildMembers.length; i++) {
+            uint256 memberId = guildMembers[i];
+            address addr = _members[memberId].addressMember;
             _burn(guildMembers[i]);
             delete _memberIdByAddress[addr];  
             delete _members[guildMembers[i]];
