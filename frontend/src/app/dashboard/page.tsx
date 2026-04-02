@@ -17,7 +17,7 @@ export default function Dashboard() {
     <>
       <div id="dashboard" style={{ display: "block" }}>
         <div className={styles.main}>
-          {isConnected && isOwner ? (
+          {isConnected ? (
             <>
               <Sidebar
                 activeSection={activeSection}

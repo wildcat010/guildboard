@@ -17,6 +17,18 @@ export function useTask(taskId: number = 0) {
     },
   });
 
+  const { data: getTasksByGuildId, refetch: refetchTasksByGuildId } =
+    useReadContract({
+      address: GUILDBOARD_ADDRESS,
+      abi: GUILDBOARD_ABI,
+      functionName: "getGuildTasks",
+      args: [taskId],
+      query: {
+        enabled: isConnected && taskId > 0,
+        retry: false,
+      },
+    });
+
   const { data: getAllTasks, refetch: refetchAllTasks } = useReadContract({
     address: GUILDBOARD_ADDRESS,
     abi: GUILDBOARD_ABI,
