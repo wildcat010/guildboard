@@ -1,7 +1,6 @@
 "use client";
-import { useTask } from "@/hooks/useTask";
 import styles from "./taskModal.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTaskManagement } from "@/hooks/useTaskManagement";
 import { Guild, Task, taskStatus } from "@/constants/constants";
 import { formatEther, parseEther } from "ethers";
@@ -18,59 +17,95 @@ export default function TaskModal({
   onClose,
   refetchAllTasks,
 }: TaskCardModalProps) {
-  const [myTask, setMyTask] = useState(task);
-
   const [editedTask, setEditedTask] = useState({
+    name: task.name,
     description: task.description,
     reward: formatEther(task.reward),
     guildId: task.guildId,
-    status: task.status,
   });
 
+  const pendingAssign = useRef(false);
+  const guildChanged = editedTask.guildId !== task.guildId;
+
   const hasChanges =
+    editedTask.name !== task.name ||
     editedTask.description !== task.description ||
     editedTask.reward !== formatEther(task.reward) ||
-    editedTask.guildId !== task.guildId;
+    guildChanged;
 
   const {
+    updateTask,
     isTaskUpdatePending,
     isTaskUpdateSuccess,
-    isTaskUpdateError,
-    updateTask,
+    assignTaskToGuild,
+    isTaskAssignPending,
+    isTaskAssignSuccess,
   } = useTaskManagement();
 
   const { guilds } = useGuild();
   const guildsArray =
-    (guilds as Guild[]).filter((guild) => guild.active == true) ?? [];
+    (guilds as Guild[]).filter((guild) => guild.active === true) ?? [];
 
-  const handleUpgrade = () => {
-    console.log("handleUpgrade");
-    updateTask(
-      task.id,
-      myTask.name,
-      editedTask.description,
-      parseEther(editedTask.reward),
-      editedTask.guildId,
-    );
-    console.log("handleUpgrade end");
-  };
-
+  // after updateTask success → assign to guild if guildId changed
   useEffect(() => {
     if (isTaskUpdateSuccess) {
-      refetchAllTasks();
-      onClose();
+      if (guildChanged) {
+        pendingAssign.current = true;
+        assignTaskToGuild(
+          editedTask.guildId,
+          task.id,
+          "0x0000000000000000000000000000000000000000",
+        );
+      } else {
+        refetchAllTasks();
+        onClose();
+      }
     }
   }, [isTaskUpdateSuccess]);
 
+  // after assignTask success → refetch and close
+  useEffect(() => {
+    if (isTaskAssignSuccess && pendingAssign.current) {
+      pendingAssign.current = false;
+      refetchAllTasks();
+      onClose();
+    }
+  }, [isTaskAssignSuccess]);
+
+  const handleUpdate = () => {
+    updateTask(
+      task.id,
+      editedTask.name,
+      editedTask.description,
+      parseEther(editedTask.reward),
+    );
+  };
+
+  const isPending = isTaskUpdatePending || isTaskAssignPending;
+
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modal}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <button className={styles.modalClose} onClick={onClose}>
           ✕
         </button>
-        <div className={styles.modalTitle}>⚔ Task Card - #{task.id}</div>
+        <div className={styles.modalTitle}>⚔ Task - #{Number(task.id)}</div>
+
+        {/* ── Name ── */}
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>{task.name}</span>
+          <span className={styles.formLabel}>Name</span>
+          <input
+            className={styles.rewardInput}
+            type="text"
+            value={editedTask.name}
+            onChange={(e) =>
+              setEditedTask({ ...editedTask, name: e.target.value })
+            }
+          />
+        </div>
+
+        {/* ── Description ── */}
+        <div className={styles.formGroup}>
           <span className={styles.formLabel}>Description</span>
           <textarea
             className={styles.descriptionArea}
@@ -80,6 +115,8 @@ export default function TaskModal({
             }
           />
         </div>
+
+        {/* ── Reward ── */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Reward (ETH)</span>
           <input
@@ -91,8 +128,12 @@ export default function TaskModal({
             }
           />
         </div>
+
+        {/* ── Guild ── */}
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>Guild - #{task.guildId}</span>
+          <span className={styles.formLabel}>
+            Guild — current: #{Number(task.guildId)}
+          </span>
           <select
             className={styles.statusSelect}
             value={editedTask.guildId.toString()}
@@ -100,31 +141,36 @@ export default function TaskModal({
               setEditedTask({ ...editedTask, guildId: BigInt(e.target.value) })
             }
           >
-            <option key={0} value={0}>
-              {"NA"}
-            </option>
+            <option value="0">NA</option>
             {guildsArray.map((guild) => (
-              <option key={guild.id} value={guild.id.toString()}>
+              <option key={guild.id.toString()} value={guild.id.toString()}>
                 {guild.name}
               </option>
             ))}
           </select>
         </div>
 
+        {/* ── Status ── */}
         <div className={styles.formGroup}>
-          <span className={styles.formLabel}>Status - #{task.status}</span>
-          <p>{taskStatus[task.status]}</p>
+          <span className={styles.formLabel}>Status</span>
+          <p>{taskStatus[Number(task.status)]}</p>
         </div>
+
+        {/* ── Actions ── */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Actions</span>
           <div className={styles.container}>
             {hasChanges && (
               <button
                 className={styles.button}
-                onClick={handleUpgrade}
-                disabled={isTaskUpdatePending}
+                onClick={handleUpdate}
+                disabled={isPending}
               >
-                {isTaskUpdatePending ? "⬆ Upgrading..." : "⬆ Upgrade"}
+                {isTaskUpdatePending
+                  ? "⬆ Updating..."
+                  : isTaskAssignPending
+                    ? "⬆ Assigning..."
+                    : "⬆ Update"}
               </button>
             )}
           </div>

@@ -1,15 +1,13 @@
 "use client";
 import { useWriteContract } from "wagmi";
 import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
-import { parseEther, parseUnits } from "ethers";
-import { useEffect } from "react";
 
 export function useTaskManagement() {
   const {
-    writeContract: writeTask,
-    isPending: isTaskPending,
-    isSuccess: isTaskSuccess,
-    isError: isTaskError,
+    writeContract: writeCreateTask,
+    isPending: isTaskCreatePending,
+    isSuccess: isTaskCreateSuccess,
+    isError: isTaskCreateError,
   } = useWriteContract();
 
   const {
@@ -17,15 +15,32 @@ export function useTaskManagement() {
     isPending: isTaskUpdatePending,
     isSuccess: isTaskUpdateSuccess,
     isError: isTaskUpdateError,
-    error: taskUpdateError,
+    reset: resetUpdateTask,
   } = useWriteContract();
 
-  useEffect(() => {
-    if (taskUpdateError) console.error("updateTask error:", taskUpdateError);
-  }, [taskUpdateError]);
+  const {
+    writeContract: writeAssignTask,
+    isPending: isTaskAssignPending,
+    isSuccess: isTaskAssignSuccess,
+    isError: isTaskAssignError,
+  } = useWriteContract();
+
+  const {
+    writeContract: writeUpdateStatus,
+    isPending: isTaskStatusPending,
+    isSuccess: isTaskStatusSuccess,
+    isError: isTaskStatusError,
+  } = useWriteContract();
+
+  const {
+    writeContract: writeCloseAndPay,
+    isPending: isCloseAndPayPending,
+    isSuccess: isCloseAndPaySuccess,
+    isError: isCloseAndPayError,
+  } = useWriteContract();
 
   function createTask(name: string, description: string, reward: bigint) {
-    writeTask({
+    writeCreateTask({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "createTask",
@@ -38,24 +53,71 @@ export function useTaskManagement() {
     name: string,
     description: string,
     reward: bigint,
-    guildId: bigint,
   ) {
     writeUpdateTask({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "updateTask",
-      args: [taskId, name, description, reward, guildId],
+      args: [taskId, name, description, reward],
+    });
+  }
+
+  function assignTaskToGuild(
+    guildId: bigint,
+    taskId: bigint,
+    assigneeAddress: string,
+  ) {
+    writeAssignTask({
+      address: GUILDBOARD_ADDRESS,
+      abi: GUILDBOARD_ABI,
+      functionName: "AssignTaskToGuild",
+      args: [guildId, taskId, assigneeAddress as `0x${string}`],
+    });
+  }
+
+  function updateTaskStatus(taskId: bigint, newStatus: number) {
+    writeUpdateStatus({
+      address: GUILDBOARD_ADDRESS,
+      abi: GUILDBOARD_ABI,
+      functionName: "updateTaskStatus",
+      args: [taskId, newStatus],
+    });
+  }
+
+  function closeAndPayTask(taskId: bigint) {
+    writeCloseAndPay({
+      address: GUILDBOARD_ADDRESS,
+      abi: GUILDBOARD_ABI,
+      functionName: "closeAndPayTask",
+      args: [taskId],
     });
   }
 
   return {
-    isTaskPending,
-    isTaskSuccess,
-    isTaskError,
     createTask,
+    isTaskCreatePending,
+    isTaskCreateSuccess,
+    isTaskCreateError,
+    // ✅ aliases for backward compat with AddTaskModal
+    isTaskPending: isTaskCreatePending,
+    isTaskSuccess: isTaskCreateSuccess,
+    isTaskError: isTaskCreateError,
+    updateTask,
     isTaskUpdatePending,
     isTaskUpdateSuccess,
     isTaskUpdateError,
-    updateTask,
+    resetUpdateTask,
+    assignTaskToGuild,
+    isTaskAssignPending,
+    isTaskAssignSuccess,
+    isTaskAssignError,
+    updateTaskStatus,
+    isTaskStatusPending,
+    isTaskStatusSuccess,
+    isTaskStatusError,
+    closeAndPayTask,
+    isCloseAndPayPending,
+    isCloseAndPaySuccess,
+    isCloseAndPayError,
   };
 }

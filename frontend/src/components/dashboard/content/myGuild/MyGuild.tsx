@@ -12,19 +12,23 @@ import { useAccount } from "wagmi";
 import { Member, roleNames, Task } from "@/constants/constants";
 import { useGuild } from "@/hooks/useGuild";
 import { useTask } from "@/hooks/useTask";
+import TaskCard from "../../questboard/taskCard/taskCard";
 
 export default function MyGuild() {
   const { address } = useAccount();
   const { isOwner } = useGuild();
   const { getMemberByAddress } = useMember(0, address ?? "");
-  const { getAllTasks, refetchAllTasks } = useTask();
-
   const myMember = getMemberByAddress as Member | undefined;
 
-  const allTasks =
-    (getAllTasks as Task[])?.filter(
-      (task: Task) => Number(task.guildId) == 0,
-    ) ?? [];
+  const guildId = myMember?.guildId ? Number(myMember.guildId) : 0;
+
+  const { getTasksByGuildId, refetchTasksByGuildId } = useTask(0, guildId);
+
+  const allTasksForGuild = (getTasksByGuildId as Task[]) ?? [];
+
+  console.log("myMember:", myMember);
+  console.log("guildId:", guildId);
+  console.log("getTasksByGuildId:", getTasksByGuildId);
 
   return (
     <>
@@ -47,11 +51,11 @@ export default function MyGuild() {
         <div className={styles.pageGuilds}>{/* //CARD HERE */}</div>
 
         <div className={styles.pageTasks}>
-          {allTasksUnassigned.map((task: Task) => (
+          {allTasksForGuild.map((task: Task) => (
             <TaskCard
               key={task.id.toString()}
               task={task}
-              refetchAllTasks={refetchAllTasks}
+              refetchAllTasks={refetchTasksByGuildId}
             ></TaskCard>
           ))}
         </div>

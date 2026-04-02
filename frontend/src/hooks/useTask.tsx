@@ -3,7 +3,7 @@ import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
 
-export function useTask(taskId: number = 0) {
+export function useTask(taskId: number = 0, guildId: number = 0) {
   const { isConnected } = useAccount();
 
   const { data: getTaskById, refetch: refetchTaskById } = useReadContract({
@@ -22,9 +22,9 @@ export function useTask(taskId: number = 0) {
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "getGuildTasks",
-      args: [taskId],
+      args: [guildId],
       query: {
-        enabled: isConnected && taskId > 0,
+        enabled: isConnected && guildId > 0,
         retry: false,
       },
     });
@@ -41,5 +41,7 @@ export function useTask(taskId: number = 0) {
     refetchTaskById,
     getAllTasks,
     refetchAllTasks,
+    getTasksByGuildId,
+    refetchTasksByGuildId,
   };
 }
