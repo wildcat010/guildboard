@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./membersTable.module.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Guild, Member, roleNames } from "./../../../../constants/constants";
 import { SimpleTable } from "simple-table-core";
 import { useMember } from "@/hooks/useMember";
@@ -15,7 +15,7 @@ const headers = [
   { accessor: "id", label: "ID", width: 60 },
   { accessor: "user", label: "User", width: 220 },
   { accessor: "addressMember", label: "Address", width: 300 },
-  { accessor: "guildName", label: "Guild", width: 160 }, // display name
+  { accessor: "guildName", label: "Guild", width: 160 },
   { accessor: "action", label: "", width: 120 },
 ];
 
@@ -26,20 +26,20 @@ function GuildName({ guildId }: { guildId: number }) {
 }
 
 export default function MembersTable() {
-  const { getAllMembers, refetchMember } = useMember();
+  const { getAllMembers, refetchMember, refetchAllMember } = useMember();
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
+  const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
 
-  useEffect(() => {
-    setMembers((getAllMembers as Member[]) ?? []);
-  }, [getAllMembers]);
+  const allMembers = ((getAllMembers as Member[]) ?? []).filter(
+    (m) => !deletedIds.has(Number(m.id)),
+  );
 
   const handleDeleteSuccess = (deletedId: number) => {
-    setMembers((prev) => prev.filter((m) => Number(m.id) !== deletedId));
+    setDeletedIds((prev) => new Set(prev).add(deletedId));
     setSelectedMember(null);
   };
 
-  const rows = members.map((member) => ({
+  const rows = allMembers.map((member) => ({
     id: Number(member.id),
     user: (
       <div className="userCell">
@@ -50,12 +50,7 @@ export default function MembersTable() {
     addressMember: <div className="addressCell">{member.addressMember}</div>,
     guildName: <GuildName guildId={Number(member.guildId)} />,
     action: (
-      <button
-        className="updateBtn"
-        onClick={() => {
-          setSelectedMember(member);
-        }}
-      >
+      <button className="updateBtn" onClick={() => setSelectedMember(member)}>
         Update
       </button>
     ),
@@ -67,6 +62,7 @@ export default function MembersTable() {
         <MemberModal
           member={selectedMember}
           refetchMember={refetchMember}
+          refetchAllMember={refetchAllMember}
           onClose={() => setSelectedMember(null)}
           onDeleteSuccess={() => handleDeleteSuccess(Number(selectedMember.id))}
         />

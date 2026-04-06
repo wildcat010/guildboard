@@ -30,6 +30,8 @@ export default function MyGuild() {
   console.log("guildId:", guildId);
   console.log("getTasksByGuildId:", getTasksByGuildId);
 
+  const myGuildSelection = false;
+
   return (
     <>
       <div className={styles.content}>
@@ -56,6 +58,7 @@ export default function MyGuild() {
               key={task.id.toString()}
               task={task}
               refetchAllTasks={refetchTasksByGuildId}
+              guildSelection={myGuildSelection}
             ></TaskCard>
           ))}
         </div>

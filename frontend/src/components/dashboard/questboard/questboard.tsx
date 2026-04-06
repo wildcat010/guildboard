@@ -65,6 +65,7 @@ export default function Questboard() {
             key={task.id.toString()}
             task={task}
             refetchAllTasks={refetchAllTasks}
+            guildSelection={true}
           ></TaskCard>
         ))}
       </div>
@@ -77,6 +78,7 @@ export default function Questboard() {
             key={task.id.toString()}
             task={task}
             refetchAllTasks={refetchAllTasks}
+            guildSelection={true}
           ></TaskCard>
         ))}
       </div>

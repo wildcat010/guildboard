@@ -13,6 +13,7 @@ type MemberModalProps = {
   member: Member;
   refetchMember: () => void;
   onDeleteSuccess: () => void;
+  refetchAllMember: () => void;
 };
 
 export default function MemberModal({
@@ -20,6 +21,7 @@ export default function MemberModal({
   member,
   refetchMember,
   onDeleteSuccess,
+  refetchAllMember,
 }: MemberModalProps) {
   const [selectedRole, setSelectedRole] = useState(Number(member.role));
 
@@ -71,6 +73,7 @@ export default function MemberModal({
   useEffect(() => {
     if (isUpgradingSuccess) {
       refetchGuildMembers();
+      refetchAllMember();
       refetchMember();
     }
   }, [isUpgradingSuccess, refetchGuildMembers, refetchMember]);

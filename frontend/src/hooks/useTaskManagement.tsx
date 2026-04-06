@@ -26,7 +26,7 @@ export function useTaskManagement() {
   } = useWriteContract();
 
   const {
-    writeContract: writeUpdateStatus,
+    writeContract: writeUpdateTaskStatus,
     isPending: isTaskStatusPending,
     isSuccess: isTaskStatusSuccess,
     isError: isTaskStatusError,
@@ -53,12 +53,13 @@ export function useTaskManagement() {
     name: string,
     description: string,
     reward: bigint,
+    guildId: bigint,
   ) {
     writeUpdateTask({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "updateTask",
-      args: [taskId, name, description, reward],
+      args: [taskId, name, description, reward, guildId],
     });
   }
 
@@ -76,7 +77,7 @@ export function useTaskManagement() {
   }
 
   function updateTaskStatus(taskId: bigint, newStatus: number) {
-    writeUpdateStatus({
+    writeUpdateTaskStatus({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "updateTaskStatus",

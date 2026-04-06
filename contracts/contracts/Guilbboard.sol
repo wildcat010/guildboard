@@ -219,9 +219,9 @@ Initializable
     }
 }
 
-    function AssignTaskToGuild(uint256 guildId, uint256 taskId, address payable payableAddress ) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused {
+    function AssignTaskToGuild(uint256 guildId, uint256 taskId) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused {
        Task storage myTask = _TaskIDs[taskId];
-       myTask.assignee = payableAddress;
+      
 
     if(myTask.guildId != 0){
         _removeTask(myTask.guildId, taskId);

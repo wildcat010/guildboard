@@ -10,11 +10,13 @@ import TaskModal from "../taskModal/taskModal";
 type TaskCardModalProps = {
   task: Task;
   refetchAllTasks: () => void;
+  guildSelection: boolean;
 };
 
 export default function TaskCard({
   task,
   refetchAllTasks,
+  guildSelection,
 }: TaskCardModalProps) {
   const [showModal, setShowModal] = useState(false);
 
@@ -48,6 +50,7 @@ export default function TaskCard({
           task={task}
           refetchAllTasks={refetchAllTasks}
           onClose={() => setShowModal(false)}
+          guildSelection={guildSelection}
         ></TaskModal>
       )}
     </>
