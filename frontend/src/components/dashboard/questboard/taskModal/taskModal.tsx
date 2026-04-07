@@ -42,9 +42,6 @@ export default function TaskModal({
     updateTaskStatus,
     isTaskUpdatePending,
     isTaskUpdateSuccess,
-    assignTaskToGuild,
-    isTaskAssignPending,
-    isTaskAssignSuccess,
     isTaskStatusPending,
     isTaskStatusSuccess,
   } = useTaskManagement();
@@ -62,27 +59,10 @@ export default function TaskModal({
 
   useEffect(() => {
     if (isTaskUpdateSuccess) {
-      if (guildChanged) {
-        pendingAssign.current = true;
-        assignTaskToGuild(
-          editedTask.guildId,
-          task.id,
-          "0x0000000000000000000000000000000000000000",
-        );
-      } else {
-        refetchAllTasks();
-        onClose();
-      }
-    }
-  }, [isTaskUpdateSuccess]);
-
-  useEffect(() => {
-    if (isTaskAssignSuccess && pendingAssign.current) {
-      pendingAssign.current = false;
       refetchAllTasks();
       onClose();
     }
-  }, [isTaskAssignSuccess]);
+  }, [isTaskUpdateSuccess]);
 
   const handleUpdate = () => {
     if (guildSelection) {
@@ -98,7 +78,7 @@ export default function TaskModal({
     }
   };
 
-  const isPending = isTaskUpdatePending || isTaskAssignPending;
+  const isPending = isTaskUpdatePending;
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -232,7 +212,7 @@ export default function TaskModal({
               >
                 {isTaskUpdatePending || isTaskStatusPending
                   ? "⬆ Updating..."
-                  : isTaskAssignPending || isTaskStatusPending
+                  : isTaskStatusPending
                     ? "⬆ Assigning..."
                     : "⬆ Update"}
               </button>

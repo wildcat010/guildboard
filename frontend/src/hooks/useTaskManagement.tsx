@@ -19,13 +19,6 @@ export function useTaskManagement() {
   } = useWriteContract();
 
   const {
-    writeContract: writeAssignTask,
-    isPending: isTaskAssignPending,
-    isSuccess: isTaskAssignSuccess,
-    isError: isTaskAssignError,
-  } = useWriteContract();
-
-  const {
     writeContract: writeUpdateTaskStatus,
     isPending: isTaskStatusPending,
     isSuccess: isTaskStatusSuccess,
@@ -58,21 +51,8 @@ export function useTaskManagement() {
     writeUpdateTask({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
-      functionName: "updateTask",
+      functionName: "updateTaskAndAssign",
       args: [taskId, name, description, reward, guildId],
-    });
-  }
-
-  function assignTaskToGuild(
-    guildId: bigint,
-    taskId: bigint,
-    assigneeAddress: string,
-  ) {
-    writeAssignTask({
-      address: GUILDBOARD_ADDRESS,
-      abi: GUILDBOARD_ABI,
-      functionName: "AssignTaskToGuild",
-      args: [guildId, taskId, assigneeAddress as `0x${string}`],
     });
   }
 
@@ -108,10 +88,6 @@ export function useTaskManagement() {
     isTaskUpdateSuccess,
     isTaskUpdateError,
     resetUpdateTask,
-    assignTaskToGuild,
-    isTaskAssignPending,
-    isTaskAssignSuccess,
-    isTaskAssignError,
     updateTaskStatus,
     isTaskStatusPending,
     isTaskStatusSuccess,

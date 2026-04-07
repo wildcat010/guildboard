@@ -146,17 +146,26 @@ Initializable
         return _TaskIDs[taskId];
     }
 
-    function updateTask(uint256 taskId, string memory name, string memory description, uint256 reward, uint256 guildId) external onlyOwner taskExists(taskId) whenNotPaused
+    function updateTaskAndAssign(uint256 taskId, string memory name, string memory description, uint256 reward, uint256 guildId) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused
     {
         Task storage myTask = _TaskIDs[taskId];
         require(!myTask.paid, "GuildBoard: task already paid");
         require(myTask.status != TaskStatus.Close, "GuildBoard: task is closed");
-       
+
         myTask.name = name;
         myTask.description = description;
         myTask.reward = reward;
+
+        if (guildId != myTask.guildId) {
+            if (myTask.guildId != 0) {
+                _removeTask(myTask.guildId, taskId);
+            }
+        }
         myTask.guildId = guildId;
-        
+        if (guildId != 0) {
+            _guildTasks[guildId].push(taskId);
+        }
+  
         emit TaskUpdated(taskId);
     }
 
@@ -218,19 +227,6 @@ Initializable
         }
     }
 }
-
-    function AssignTaskToGuild(uint256 guildId, uint256 taskId) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused {
-       Task storage myTask = _TaskIDs[taskId];
-      
-
-    if(myTask.guildId != 0){
-        _removeTask(myTask.guildId, taskId);
-    }
-
-       myTask.guildId = guildId;
-       _guildTasks[guildId].push(taskId);
-       emit TaskAssigned(taskId,guildId);
-    }
 
     // =========================================
     // CONSTRUCTOR & INITIALIZER

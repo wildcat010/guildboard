@@ -146,7 +146,13 @@ describe("Task management", function () {
     const task = await guildboard.getTask(1);
     expect(task.guildId).to.equal(0);
 
-    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
+    await guildboard.updateTaskAndAssign(
+      1,
+      "task 1",
+      "test task",
+      parseEther("0.1"),
+      1,
+    );
 
     const taskUpdated = await guildboard.getTask(1);
     expect(taskUpdated.guildId).to.equal(1);
@@ -157,8 +163,16 @@ describe("Task management", function () {
     const task = await guildboard.getTask(1);
     expect(task.guildId).to.equal(0);
 
+    //function updateTaskAndAssign(uint256 taskId, string memory name, string memory description, uint256 reward, uint256 guildId)
+
     await expect(
-      guildboard.AssignTaskToGuild(1, 1, otherAccount),
+      guildboard.updateTaskAndAssign(
+        1,
+        "task 1",
+        "test task",
+        parseEther("0.1"),
+        1,
+      ),
     ).to.be.revertedWith("GuildNFT: guild does not exist");
   });
 
@@ -198,7 +212,13 @@ describe("Task management", function () {
 
     await guildboard.updateTaskStatus(1, 3);
 
-    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
+    await guildboard.updateTaskAndAssign(
+      1,
+      "task 1",
+      "test task",
+      parseEther("0.1"),
+      1,
+    );
 
     await expect(guildboard.closeAndPayTask(1))
       .to.emit(guildboard, "TaskDoneAndPaid")
@@ -213,7 +233,13 @@ describe("Task management", function () {
   it("should verfied a task and not pay the assignee because we are not the owner", async () => {
     await guildNFT.createGuild("guild Test");
     await guildboard.createTask("task 1", "test task", parseEther("0.1"));
-    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
+    await guildboard.updateTaskAndAssign(
+      1,
+      "task 1",
+      "test task",
+      parseEther("0.1"),
+      1,
+    );
     await guildboard.updateTaskStatus(1, 3);
 
     await expect(guildboard.connect(otherAccount).closeAndPayTask(1))
@@ -225,8 +251,20 @@ describe("Task management", function () {
     await guildNFT.createGuild("guild Test");
     await guildboard.createTask("task 1", "test task", parseEther("0.1"));
     await guildboard.createTask("task 2", "test task", parseEther("0.1"));
-    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
-    await guildboard.AssignTaskToGuild(1, 2, otherAccount2);
+    await guildboard.updateTaskAndAssign(
+      1,
+      "task 1",
+      "test task",
+      parseEther("0.1"),
+      1,
+    );
+    await guildboard.updateTaskAndAssign(
+      2,
+      "task 2",
+      "test task",
+      parseEther("0.1"),
+      1,
+    );
 
     const task = await guildboard.getGuildTasks(1);
     expect(task.length).to.equal(2);
@@ -240,7 +278,13 @@ describe("Task management", function () {
     await guildboard.createTask("task 2", "test task", parseEther("0.1"));
     await guildboard.createTask("task 3", "test task", parseEther("0.1"));
 
-    await guildboard.AssignTaskToGuild(1, 1, otherAccount);
+    await guildboard.updateTaskAndAssign(
+      1,
+      "task 1",
+      "test task",
+      parseEther("0.1"),
+      1,
+    );
 
     const task = await guildboard.getAllTasks();
     expect(task.length).to.equal(3);
