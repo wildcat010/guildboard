@@ -57,8 +57,6 @@ export default function TaskModal({
 
   useEffect(() => {
     if (isTaskStatusSuccess) {
-      console.log("Task status updated successfully. Refetching tasks...");
-
       refetchAllTasks();
       onClose();
     }
@@ -66,15 +64,6 @@ export default function TaskModal({
 
   useEffect(() => {
     if (isTaskUpdateSuccess) {
-      console.log(
-        "Task updated successfully. Assignee sent:",
-        editedTask.assignee,
-      );
-      console.log(
-        "Original task assignee before refetch:",
-        (task as { assignee?: string }).assignee,
-      );
-
       refetchAllTasks();
 
       onClose();

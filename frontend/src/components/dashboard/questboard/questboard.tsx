@@ -22,9 +22,6 @@ export default function Questboard() {
       (task: Task) => Number(task.guildId) != 0,
     ) ?? [];
 
-  console.log("allTasksUnassigned", allTasksUnassigned);
-  console.log("allTasksAssigned", allTasksAssigned);
-
   return (
     <div className={styles.content}>
       <div className={`${styles.pageHeader} ${styles.animateIn}`}>

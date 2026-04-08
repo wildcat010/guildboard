@@ -10,9 +10,6 @@ import GuildPanel from "./guildPanel/guildPanel";
 
 export default function Rightbar() {
   const { guildCount, guildCountLimit, isOwner } = useGuild();
-  console.log("guildCount:", guildCount);
-  console.log("guildCountLimit:", guildCountLimit);
-  console.log("isOwner:", isOwner);
 
   const count = (guildCount as bigint)?.toString() ?? "0";
   const guildsArray = (guildCountLimit as Guild[]) ?? [];

@@ -12,10 +12,6 @@ type GuildPanelProps = {
 };
 
 export default function GuildPanel({ guilds }: GuildPanelProps) {
-  useEffect(() => {
-    console.log("guilds", guilds);
-  });
-
   return (
     <>
       {guilds.map((guild: Guild) => (

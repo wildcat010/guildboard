@@ -25,7 +25,6 @@ export function ListQuestToPay({
     usePayment();
 
   function handlePay() {
-    console.log("pay");
     paidAndCloseQuest(BigInt(task.id));
   }
 

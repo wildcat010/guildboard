@@ -26,16 +26,11 @@ export default function MyGuild() {
 
   const allTasksForGuild = (getTasksByGuildId as Task[]) ?? [];
 
-  console.log("myMember:", myMember);
-  console.log("guildId:", guildId);
-  console.log("getTasksByGuildId:", getTasksByGuildId);
-
   const myGuildSelection = false;
 
   useEffect(() => {
     if (guildId > 0) {
       refetchTasksByGuildId();
-      console.log("getTasksByGuildId", getTasksByGuildId);
     }
   }, [guildId]);
 

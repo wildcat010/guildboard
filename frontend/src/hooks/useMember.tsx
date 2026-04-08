@@ -36,9 +36,6 @@ export function useMember(memberId: number = 0, adr: string = "") {
     query: { enabled: isConnected, retry: false },
   });
 
-  console.log("error", error);
-  console.log("isLoading", isLoading);
-
   return {
     getMemberById,
     refetchMember,
