@@ -1,0 +1,40 @@
+.memberListItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+  border-color: #c9a84c33;
+  background: rgba(201, 168, 76, 0.04);
+}
+
+.memberInfo {
+  flex: 1;
+  min-width: 0;
+}
+.memberListName {
+  font-weight: 700;
+  font-size: 12px;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
+}
+.memberListRole {
+  font-size: 11px;
+  color: #6b7280;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.gold {
+  color: #c9a84c;
+}
+.memberUpdate {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 12px;
+  color: #c9a84c;
+  text-align: right;
+  border: 1px solid #c9a84c;
+  padding: 4px 8px;
+}

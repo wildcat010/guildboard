@@ -30,7 +30,7 @@ export default function TaskCard({
         }}
       >
         <div className={styles.taskTitle}>
-          #{task.id} - {task.description}
+          #{task.id} - {task.name}
         </div>
         <div className={styles.taskSkills}>
           <span className={styles.skillTag}>

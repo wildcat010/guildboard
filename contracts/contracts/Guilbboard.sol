@@ -146,28 +146,38 @@ Initializable
         return _TaskIDs[taskId];
     }
 
-    function updateTaskAndAssign(uint256 taskId, string memory name, string memory description, uint256 reward, uint256 guildId) external onlyOwner taskExists(taskId) guildActiveOnNFT(guildId) whenNotPaused
-    {
-        Task storage myTask = _TaskIDs[taskId];
-        require(!myTask.paid, "GuildBoard: task already paid");
-        require(myTask.status != TaskStatus.Close, "GuildBoard: task is closed");
+    function updateTaskAndAssign(
+    uint256 taskId,
+    string memory name,
+    string memory description,
+    uint256 reward,
+    uint256 guildId,
+    address payable  assignee
+) external onlyOwner taskExists(taskId) whenNotPaused {
+    Task storage myTask = _TaskIDs[taskId];
+    require(!myTask.paid, "GuildBoard: task already paid");
+    require(myTask.status != TaskStatus.Close, "GuildBoard: task is closed");
 
-        myTask.name = name;
-        myTask.description = description;
-        myTask.reward = reward;
+    myTask.name = name;
+    myTask.description = description;
+    myTask.reward = reward;
+    myTask.assignee = assignee;
 
-        if (guildId != myTask.guildId) {
-            if (myTask.guildId != 0) {
-                _removeTask(myTask.guildId, taskId);
-            }
-        }
-        myTask.guildId = guildId;
+    if (guildId != myTask.guildId) {
         if (guildId != 0) {
+            IGuildNFT.Guild memory g = guildNFT.getGuild(guildId);
+            require(g.active, "GuildBoard: guild is not active");
             _guildTasks[guildId].push(taskId);
         }
-  
-        emit TaskUpdated(taskId);
+        if (myTask.guildId != 0) {
+            _removeTask(myTask.guildId, taskId);
+        }
+        myTask.guildId = guildId;
+        emit TaskAssigned(taskId, guildId);
     }
+
+    emit TaskUpdated(taskId);
+}
 
     function updateTaskStatus(uint256 taskId, TaskStatus newStatus) external onlyOwner taskExists(taskId) whenNotPaused
     {
@@ -205,6 +215,8 @@ Initializable
         Task storage myTask = _TaskIDs[taskId];
         require(myTask.status == TaskStatus.Verified, "GuildBoard: task not verified");
         require(!myTask.paid, "GuildBoard: already paid");
+        require(address(this).balance >= myTask.reward, "GuildBoard: insufficient contract balance"); 
+
 
         myTask.paid = true;
         myTask.status = TaskStatus.Close;

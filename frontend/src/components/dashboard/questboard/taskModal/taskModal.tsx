@@ -1,10 +1,11 @@
 "use client";
 import styles from "./taskModal.module.css";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useTaskManagement } from "@/hooks/useTaskManagement";
 import { Guild, Task, taskStatus } from "@/constants/constants";
 import { formatEther, parseEther } from "ethers";
 import { useGuild } from "@/hooks/useGuild";
+import { useGuildById } from "@/hooks/useGuildById";
 
 type TaskCardModalProps = {
   task: Task;
@@ -25,17 +26,21 @@ export default function TaskModal({
     reward: formatEther(task.reward),
     guildId: task.guildId,
     taskStatus: Number(task.status),
+    assignee: (task as { assignee?: string }).assignee ?? "",
   });
 
-  const pendingAssign = useRef(false);
   const guildChanged = editedTask.guildId !== task.guildId;
+  const isTaskClosed = Number(task.status) === 4; // Assuming 4 is the closed status
+  const isTaskVerified =
+    taskStatus[Number(editedTask.taskStatus)] === "Verified";
 
   const hasChanges =
     editedTask.name !== task.name ||
     editedTask.description !== task.description ||
     editedTask.reward !== formatEther(task.reward) ||
     guildChanged ||
-    Number(editedTask.taskStatus) !== Number(task.status);
+    Number(editedTask.taskStatus) !== Number(task.status) ||
+    editedTask.assignee !== (task as { assignee?: string }).assignee;
 
   const {
     updateTask,
@@ -55,16 +60,17 @@ export default function TaskModal({
       refetchAllTasks();
       onClose();
     }
-  }, [isTaskStatusSuccess]);
+  }, [isTaskStatusSuccess, refetchAllTasks, onClose]);
 
   useEffect(() => {
     if (isTaskUpdateSuccess) {
       refetchAllTasks();
       onClose();
     }
-  }, [isTaskUpdateSuccess]);
+  }, [isTaskUpdateSuccess, refetchAllTasks, onClose]);
 
   const handleUpdate = () => {
+    console.log("task update ", editedTask);
     if (guildSelection) {
       updateTask(
         task.id,
@@ -78,7 +84,13 @@ export default function TaskModal({
     }
   };
 
-  const isPending = isTaskUpdatePending;
+  function GuildName({ guildId }: { guildId: bigint }) {
+    const { getGuildById } = useGuildById(Number(guildId));
+    const guild = getGuildById as Guild | null;
+    return <span>{guild?.name ?? `Guild #${Number(guildId)}`}</span>;
+  }
+
+  const isPending = isTaskUpdatePending || isTaskStatusPending;
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -88,12 +100,24 @@ export default function TaskModal({
         </button>
         <div className={styles.modalTitle}>⚔ Task - #{Number(task.id)}</div>
 
+        {isTaskClosed && (
+          <div
+            style={{
+              color: "#ff6b6b",
+              marginBottom: "1rem",
+              fontWeight: "bold",
+            }}
+          >
+            ⚠ This task is closed and cannot be modified
+          </div>
+        )}
+
         {/* ── Name ── */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Name</span>
           {guildSelection ? (
             <input
-              disabled={!guildSelection}
+              disabled={!guildSelection || isTaskClosed}
               className={styles.rewardInput}
               type="text"
               value={editedTask.name}
@@ -111,7 +135,7 @@ export default function TaskModal({
           <span className={styles.formLabel}>Description</span>
           {guildSelection ? (
             <textarea
-              disabled={!guildSelection}
+              disabled={!guildSelection || isTaskClosed}
               className={styles.descriptionArea}
               value={editedTask.description}
               onChange={(e) =>
@@ -128,7 +152,7 @@ export default function TaskModal({
           <span className={styles.formLabel}>Reward (ETH)</span>
           {guildSelection ? (
             <input
-              disabled={!guildSelection}
+              disabled={!guildSelection || isTaskClosed}
               className={styles.rewardInput}
               type="number"
               value={editedTask.reward}
@@ -150,7 +174,7 @@ export default function TaskModal({
             <select
               className={styles.statusSelect}
               value={editedTask.guildId.toString()}
-              disabled={!guildSelection}
+              disabled={!guildSelection || isTaskClosed}
               onChange={(e) =>
                 setEditedTask({
                   ...editedTask,
@@ -166,7 +190,7 @@ export default function TaskModal({
               ))}
             </select>
           ) : (
-            <span>{task.guildId}</span>
+            <GuildName guildId={task.guildId} />
           )}
         </div>
 
@@ -179,7 +203,7 @@ export default function TaskModal({
             <select
               className={styles.statusSelect}
               value={Number(editedTask.taskStatus)}
-              disabled={guildSelection}
+              disabled={guildSelection || isTaskClosed}
               onChange={(e) =>
                 setEditedTask({
                   ...editedTask,
@@ -200,23 +224,43 @@ export default function TaskModal({
           )}
         </div>
 
+        <div className={styles.formGroup}>
+          <span className={styles.formLabel}>
+            Assignee{" "}
+            <span className={styles.note}>
+              (can be updated only with "verified" status)
+            </span>
+          </span>
+
+          {isTaskClosed || editedTask.taskStatus !== 3 ? (
+            <span>{editedTask.assignee || ""}</span>
+          ) : (
+            <input
+              className={styles.rewardInput}
+              type="text"
+              value={editedTask.assignee}
+              onChange={(e) =>
+                setEditedTask({ ...editedTask, assignee: e.target.value })
+              }
+            />
+          )}
+        </div>
+
         {/* ── Actions ── */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Actions</span>
           <div className={styles.container}>
-            {hasChanges && (
-              <button
-                className={styles.button}
-                onClick={handleUpdate}
-                disabled={isPending}
-              >
-                {isTaskUpdatePending || isTaskStatusPending
-                  ? "⬆ Updating..."
-                  : isTaskStatusPending
-                    ? "⬆ Assigning..."
-                    : "⬆ Update"}
-              </button>
-            )}
+            <button
+              className={styles.button}
+              onClick={handleUpdate}
+              disabled={isPending || isTaskClosed || !hasChanges}
+            >
+              {isPending
+                ? isTaskStatusPending
+                  ? "⬆ Assigning..."
+                  : "⬆ Updating..."
+                : "⬆ Update"}
+            </button>
           </div>
         </div>
       </div>

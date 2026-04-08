@@ -1,5 +1,9 @@
 "use client";
+import { useGuild } from "@/hooks/useGuild";
 import styles from "./paymentModal.module.css";
+import { Guild, Task } from "@/constants/constants";
+import { useTask } from "@/hooks/useTask";
+import { ListQuestToPay } from "../listQuestToPay/listQuestToPay";
 
 type PaymentModalProps = {
   onClose: () => void;
@@ -12,6 +16,11 @@ export function PaymentModal({
   refetchBalance,
   onDepositSuccess,
 }: PaymentModalProps) {
+  const { getAllTasks, refetchAllTasks } = useTask();
+  const allTasks = (getAllTasks as Task[]) || [];
+  const verifiedTasks =
+    allTasks?.filter((task: Task) => task.status == 3) || [];
+
   return (
     <>
       <div className={styles.modalOverlay} onClick={onClose}>
@@ -27,6 +36,15 @@ export function PaymentModal({
           <div className={styles.formGroup}>
             <span className={styles.formLabel}>Actions</span>
             <div className={styles.container}>
+              {verifiedTasks.map((task: Task, i: number) => (
+                <ListQuestToPay
+                  task={task}
+                  key={i}
+                  refetchAllTasks={refetchAllTasks}
+                  refetchBalance={refetchBalance}
+                ></ListQuestToPay>
+              ))}
+
               {/* {hasChanges && (
                 <button
                   className={styles.button}

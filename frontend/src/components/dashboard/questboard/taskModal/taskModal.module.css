@@ -223,3 +223,8 @@
   transition: all 0.2s;
   display: flex;
 }
+
+.note {
+  font-size: 8px;
+  color: #c8cdd8;
+}
