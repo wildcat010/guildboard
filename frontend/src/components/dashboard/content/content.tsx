@@ -26,6 +26,8 @@ export default function Content({ activeSection }: ContentProps) {
       {activeSection === "guildMembers" && <GuildMembers />}
       {activeSection === "members" && <Members />}
       {activeSection === "payments" && <Payments />}
+      {activeSection === "mynft" && <NFT />}
+      {activeSection === "payments" && <Settings />}
     </div>
   );
 }

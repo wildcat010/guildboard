@@ -1,17 +1,14 @@
 "use client";
 
 import styles from "./MyGuild.module.css";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { useBalance } from "wagmi";
-import { GUILDBOARD_ADDRESS } from "@/contracts";
-
-import { useDeposit } from "@/hooks/useDeposit";
-import { useMember } from "@/hooks/useMember";
 import { useAccount } from "wagmi";
-import { Member, roleNames, Task } from "@/constants/constants";
+import { Member, roleNames, Task, taskStatus } from "@/constants/constants";
 import { useGuild } from "@/hooks/useGuild";
+import { useMember } from "@/hooks/useMember";
 import { useTask } from "@/hooks/useTask";
+import { formatEther, parseEther } from "ethers";
 import TaskCard from "../../questboard/taskCard/taskCard";
 
 export default function MyGuild() {
@@ -21,10 +18,7 @@ export default function MyGuild() {
   const myMember = getMemberByAddress as Member | undefined;
 
   const guildId = myMember?.guildId ? Number(myMember.guildId) : 0;
-
   const { getTasksByGuildId, refetchTasksByGuildId } = useTask(0, guildId);
-
-  const allTasksForGuild = (getTasksByGuildId as Task[]) ?? [];
 
   const myGuildSelection = false;
 
@@ -32,39 +26,72 @@ export default function MyGuild() {
     if (guildId > 0) {
       refetchTasksByGuildId();
     }
-  }, [guildId]);
+  }, [guildId, refetchTasksByGuildId]);
+
+  const taskGroups = [
+    {
+      tasks: (getTasksByGuildId as Task[])?.filter((t) => t.status === 0) ?? [],
+      status: 0,
+    },
+    {
+      tasks: (getTasksByGuildId as Task[])?.filter((t) => t.status === 1) ?? [],
+      status: 1,
+    },
+    {
+      tasks: (getTasksByGuildId as Task[])?.filter((t) => t.status === 2) ?? [],
+      status: 2,
+    },
+    {
+      tasks: (getTasksByGuildId as Task[])?.filter((t) => t.status === 3) ?? [],
+      status: 3,
+    },
+    {
+      tasks: (getTasksByGuildId as Task[])?.filter((t) => t.status === 4) ?? [],
+      status: 4,
+    },
+  ];
 
   return (
-    <>
-      <div className={styles.content}>
-        <div className={`${styles.pageHeader} ${styles.animateIn}`}>
-          <div>
-            <div className={styles.pageTitle}>
-              My Guild -
-              {`${myMember?.name} - ${roleNames[Number(myMember?.role)]}`}
-            </div>
+    <div className={styles.content}>
+      <div className={`${styles.pageHeader} ${styles.animateIn}`}>
+        <div>
+          <div className={styles.pageTitle}>
+            My Guild -{" "}
+            {`${myMember?.name} - ${roleNames[Number(myMember?.role)]}`}
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "5px",
-            }}
-          ></div>
-        </div>
-        <div className={styles.pageGuilds}>{/* //CARD HERE */}</div>
-
-        <div className={styles.pageTasks}>
-          {allTasksForGuild.map((task: Task) => (
-            <TaskCard
-              key={task.id.toString()}
-              task={task}
-              refetchAllTasks={refetchTasksByGuildId}
-              guildSelection={myGuildSelection}
-            ></TaskCard>
-          ))}
+          <div className={styles.pageSub}>
+            Rewards -{" "}
+            {formatEther(
+              taskGroups[4].tasks.reduce(
+                (acc, task) => acc + BigInt(task.reward.toString()),
+                BigInt(0),
+              ),
+            )}
+            &nbsp;ETH
+          </div>
         </div>
       </div>
-    </>
+
+      {taskGroups.map(
+        ({ tasks, status }) =>
+          tasks.length > 0 && (
+            <div key={status}>
+              <div className={styles.pageTitle}>
+                {taskStatus[status]} - {tasks.length}
+              </div>
+              <div className={styles.pageTasks}>
+                {tasks.map((task: Task) => (
+                  <TaskCard
+                    key={task.id.toString()}
+                    task={task}
+                    refetchAllTasks={refetchTasksByGuildId}
+                    guildSelection={myGuildSelection}
+                  />
+                ))}
+              </div>
+            </div>
+          ),
+      )}
+    </div>
   );
 }
