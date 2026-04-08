@@ -90,7 +90,7 @@ describe("Guildboard contract config", function () {
   it("should change the status of a task", async () => {
     await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
-    await expect(guildboard.updateTaskStatus(1, 2))
+    await expect(guildboard.updateTaskStatus(1, 2, otherAccount.address))
       .to.emit(guildboard, "TaskStatusUpdated")
       .withArgs(1, 2);
     // task to be done. The 2 is the satus Done
@@ -116,7 +116,7 @@ describe("Task management", function () {
   it("should change the status of a task", async () => {
     await guildboard.createTask("task 1", "test task", parseEther("0.1"));
 
-    await expect(guildboard.updateTaskStatus(1, 2))
+    await expect(guildboard.updateTaskStatus(1, 2, otherAccount.address))
       .to.emit(guildboard, "TaskStatusUpdated")
       .withArgs(1, 2);
     // task to be done. The 2 is the satus Done
@@ -134,7 +134,7 @@ describe("Task management", function () {
     expect(paused).to.equal(true);
 
     await expect(
-      guildboard.updateTaskStatus(1, 2),
+      guildboard.updateTaskStatus(1, 2, otherAccount.address),
     ).to.be.revertedWithCustomError(guildboard, "EnforcedPause");
   });
 
@@ -212,7 +212,7 @@ describe("Task management", function () {
     );
     expect(createTaskbalance).to.equal(hre.ethers.parseEther("0.1"));
 
-    await guildboard.updateTaskStatus(1, 3);
+    await guildboard.updateTaskStatus(1, 3, otherAccount.address);
 
     await guildboard.updateTaskAndAssign(
       1,
@@ -244,7 +244,7 @@ describe("Task management", function () {
       1,
       otherAccount.address,
     );
-    await guildboard.updateTaskStatus(1, 3);
+    await guildboard.updateTaskStatus(1, 3, otherAccount.address);
 
     await expect(guildboard.connect(otherAccount).closeAndPayTask(1))
       .to.be.revertedWithCustomError(guildboard, "OwnableUnauthorizedAccount")

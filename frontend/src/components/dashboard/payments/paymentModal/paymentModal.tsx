@@ -44,20 +44,6 @@ export function PaymentModal({
                   refetchBalance={refetchBalance}
                 ></ListQuestToPay>
               ))}
-
-              {/* {hasChanges && (
-                <button
-                  className={styles.button}
-                  onClick={handleUpdate}
-                  disabled={isPending}
-                >
-                  {isTaskUpdatePending || isTaskStatusPending
-                    ? "⬆ Updating..."
-                    : isTaskStatusPending
-                      ? "⬆ Assigning..."
-                      : "⬆ Update"}
-                </button>
-              )} */}
             </div>
           </div>
         </div>

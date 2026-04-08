@@ -38,3 +38,11 @@
   border: 1px solid #c9a84c;
   padding: 4px 8px;
 }
+.assigneeEllipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  display: inline-block;
+  vertical-align: middle;
+}

@@ -49,6 +49,12 @@ export function ListQuestToPay({
             <div className={styles.memberListName}>{myGuild?.name}</div>
           </div>
         </div>
+        <div
+          title={task.assignee}
+          className={`${styles.miniHex} ${styles.assigneeEllipsis}`}
+        >
+          {task.assignee}
+        </div>
         <button className={styles.memberUpdate} onClick={handlePay}>
           {isPaidTaskPending ? "⬆ Paying..." : "⬆ Pay"}
         </button>

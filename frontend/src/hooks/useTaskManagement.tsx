@@ -1,6 +1,7 @@
 "use client";
 import { useWriteContract } from "wagmi";
 import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
+import { useEffect } from "react";
 
 export function useTaskManagement() {
   const {
@@ -15,6 +16,7 @@ export function useTaskManagement() {
     isPending: isTaskUpdatePending,
     isSuccess: isTaskUpdateSuccess,
     isError: isTaskUpdateError,
+    error: taskUpdateError,
     reset: resetUpdateTask,
   } = useWriteContract();
 
@@ -47,21 +49,26 @@ export function useTaskManagement() {
     description: string,
     reward: bigint,
     guildId: bigint,
+    assignee: string,
   ) {
     writeUpdateTask({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "updateTaskAndAssign",
-      args: [taskId, name, description, reward, guildId],
+      args: [taskId, name, description, reward, guildId, assignee],
     });
   }
 
-  function updateTaskStatus(taskId: bigint, newStatus: number) {
+  function updateTaskStatus(
+    taskId: bigint,
+    newStatus: number,
+    assignee: string,
+  ) {
     writeUpdateTaskStatus({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "updateTaskStatus",
-      args: [taskId, newStatus],
+      args: [taskId, newStatus, assignee],
     });
   }
 
@@ -73,6 +80,12 @@ export function useTaskManagement() {
       args: [taskId],
     });
   }
+
+  useEffect(() => {
+    if (isTaskUpdateError && taskUpdateError) {
+      console.error("Update Task Error:", taskUpdateError);
+    }
+  }, [isTaskUpdateError, taskUpdateError]);
 
   return {
     createTask,

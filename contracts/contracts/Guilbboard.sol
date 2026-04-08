@@ -179,10 +179,11 @@ Initializable
     emit TaskUpdated(taskId);
 }
 
-    function updateTaskStatus(uint256 taskId, TaskStatus newStatus) external onlyOwner taskExists(taskId) whenNotPaused
+    function updateTaskStatus(uint256 taskId, TaskStatus newStatus, address payable assignee) external onlyOwner taskExists(taskId) whenNotPaused
     {
         Task storage myTask = _TaskIDs[taskId];
         myTask.status = newStatus;
+        myTask.assignee = assignee; 
         emit TaskStatusUpdated(taskId, newStatus);
     }
 

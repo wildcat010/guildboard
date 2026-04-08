@@ -23,7 +23,7 @@ export type Task = {
   description: string;
   status: number;
   poster: string; // who created the task
-  assignee: string; // who does the task and gets paid
+  assignee?: string; // who does the task and gets paid
   guildId: bigint;
   reward: bigint; // ← ETH in escrow
   paid: boolean; // ← prevent double payment

@@ -6,7 +6,7 @@ import { Guild, Task, taskStatus } from "@/constants/constants";
 import { formatEther, parseEther } from "ethers";
 import { useGuild } from "@/hooks/useGuild";
 import { useGuildById } from "@/hooks/useGuildById";
-
+import { isAddress } from "ethers";
 type TaskCardModalProps = {
   task: Task;
   onClose: () => void;
@@ -20,6 +20,8 @@ export default function TaskModal({
   refetchAllTasks,
   guildSelection,
 }: TaskCardModalProps) {
+  const [assigneeError, setAssigneeError] = useState<string>("");
+
   const [editedTask, setEditedTask] = useState({
     name: task.name,
     description: task.description,
@@ -31,8 +33,6 @@ export default function TaskModal({
 
   const guildChanged = editedTask.guildId !== task.guildId;
   const isTaskClosed = Number(task.status) === 4; // Assuming 4 is the closed status
-  const isTaskVerified =
-    taskStatus[Number(editedTask.taskStatus)] === "Verified";
 
   const hasChanges =
     editedTask.name !== task.name ||
@@ -57,6 +57,8 @@ export default function TaskModal({
 
   useEffect(() => {
     if (isTaskStatusSuccess) {
+      console.log("Task status updated successfully. Refetching tasks...");
+
       refetchAllTasks();
       onClose();
     }
@@ -64,13 +66,28 @@ export default function TaskModal({
 
   useEffect(() => {
     if (isTaskUpdateSuccess) {
+      console.log(
+        "Task updated successfully. Assignee sent:",
+        editedTask.assignee,
+      );
+      console.log(
+        "Original task assignee before refetch:",
+        (task as { assignee?: string }).assignee,
+      );
+
       refetchAllTasks();
+
       onClose();
     }
-  }, [isTaskUpdateSuccess, refetchAllTasks, onClose]);
+  }, [
+    isTaskUpdateSuccess,
+    refetchAllTasks,
+    onClose,
+    editedTask.assignee,
+    task,
+  ]);
 
   const handleUpdate = () => {
-    console.log("task update ", editedTask);
     if (guildSelection) {
       updateTask(
         task.id,
@@ -78,9 +95,14 @@ export default function TaskModal({
         editedTask.description,
         parseEther(editedTask.reward),
         editedTask.guildId ?? 0,
+        editedTask.assignee as `0x${string}`,
       );
     } else {
-      updateTaskStatus(task.id, editedTask.taskStatus);
+      updateTaskStatus(
+        task.id,
+        editedTask.taskStatus,
+        editedTask.assignee as `0x${string}`,
+      );
     }
   };
 
@@ -232,17 +254,33 @@ export default function TaskModal({
             </span>
           </span>
 
-          {isTaskClosed || editedTask.taskStatus !== 3 ? (
-            <span>{editedTask.assignee || ""}</span>
+          {!isTaskClosed && (guildSelection || editedTask.taskStatus === 3) ? (
+            <>
+              <input
+                className={styles.rewardInput}
+                type="text"
+                value={editedTask.assignee}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setEditedTask({ ...editedTask, assignee: value });
+
+                  // real-time validation
+                  if (value && !isAddress(value)) {
+                    setAssigneeError("❌ Invalid Ethereum address");
+                  } else {
+                    setAssigneeError("");
+                  }
+                }}
+              />
+              {/* Show error message */}
+              {assigneeError && (
+                <div style={{ color: "red", marginTop: "0.25rem" }}>
+                  {assigneeError}
+                </div>
+              )}
+            </>
           ) : (
-            <input
-              className={styles.rewardInput}
-              type="text"
-              value={editedTask.assignee}
-              onChange={(e) =>
-                setEditedTask({ ...editedTask, assignee: e.target.value })
-              }
-            />
+            <span>{editedTask.assignee || ""}</span>
           )}
         </div>
 
@@ -253,7 +291,9 @@ export default function TaskModal({
             <button
               className={styles.button}
               onClick={handleUpdate}
-              disabled={isPending || isTaskClosed || !hasChanges}
+              disabled={
+                isPending || isTaskClosed || !hasChanges || !!assigneeError
+              }
             >
               {isPending
                 ? isTaskStatusPending

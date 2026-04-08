@@ -32,6 +32,13 @@ export default function MyGuild() {
 
   const myGuildSelection = false;
 
+  useEffect(() => {
+    if (guildId > 0) {
+      refetchTasksByGuildId();
+      console.log("getTasksByGuildId", getTasksByGuildId);
+    }
+  }, [guildId]);
+
   return (
     <>
       <div className={styles.content}>
