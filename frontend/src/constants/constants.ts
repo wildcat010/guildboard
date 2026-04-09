@@ -56,6 +56,5 @@ export type Section =
   | "guildMembers"
   | "members"
   | "payments"
-  | "mynft"
   | "myGuild"
   | "settings";

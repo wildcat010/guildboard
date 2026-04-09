@@ -6,7 +6,8 @@ import { useState, useEffect, useRef } from "react";
 import { useGuildById } from "@/hooks/useGuildById";
 import { useManagementMember } from "@/hooks/useManagementMember";
 import { useGuild } from "@/hooks/useGuild";
-import { useMember } from "@/hooks/useMember";
+
+const PINATA_GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY!;
 
 type MemberModalProps = {
   onClose: () => void;
@@ -23,8 +24,17 @@ export default function MemberModal({
   onDeleteSuccess,
   refetchAllMember,
 }: MemberModalProps) {
+  // ── State ──
   const [selectedRole, setSelectedRole] = useState(Number(member.role));
+  const [memberState, setMemberState] = useState<Member>(member);
+  const [nft, setNft] = useState<{
+    id: string;
+    name?: string;
+    image: string;
+  }>();
+  const pendingClose = useRef(false);
 
+  // ── Hooks ──
   const {
     upgradeMember,
     removeMember,
@@ -33,27 +43,35 @@ export default function MemberModal({
     isUpgradingSuccess,
     isRemoveMemberSuccess,
   } = useManagementMember();
+
   const { refetchGuilds } = useGuild();
   const { refetchGuildMembers, getGuildById } = useGuildById(
-    Number(member.guildId),
+    Number(memberState.guildId),
   );
-
-  const pendingClose = useRef(false);
   const guild = getGuildById as Guild;
 
-  const currentRole = Number(member.role);
-  const roleChanged = selectedRole !== currentRole;
-  const memberId = Number(member.id);
+  // ── Helpers ──
+  const ipfsToHttp = (uri: string) => {
+    if (!uri) return "";
+    if (uri.startsWith("ipfs://")) {
+      const hash = uri.replace("ipfs://", "");
+      return `https://${PINATA_GATEWAY}/ipfs/${hash}`;
+    }
+    return uri;
+  };
 
+  // ── Actions ──
   function handleUpgrade() {
-    upgradeMember(memberId, selectedRole);
+    upgradeMember(Number(memberState.id), selectedRole);
   }
 
   function handleDelete() {
     pendingClose.current = true;
-    removeMember(memberId);
+    removeMember(Number(memberState.id));
   }
 
+  // ── Effects ──
+  // Handle delete
   useEffect(() => {
     if (isRemoveMemberSuccess && pendingClose.current) {
       pendingClose.current = false;
@@ -70,6 +88,7 @@ export default function MemberModal({
     onDeleteSuccess,
   ]);
 
+  // Handle upgrade
   useEffect(() => {
     if (isUpgradingSuccess) {
       refetchGuildMembers();
@@ -78,30 +97,58 @@ export default function MemberModal({
     }
   }, [isUpgradingSuccess, refetchGuildMembers, refetchMember]);
 
+  // Load NFT metadata
+  useEffect(() => {
+    async function loadNFT() {
+      if (!memberState?.uri) return;
+
+      try {
+        const res = await fetch(ipfsToHttp(memberState.uri));
+        const metadata = await res.json();
+
+        setNft({
+          id: memberState.id.toString(),
+          name: metadata.name,
+          image: ipfsToHttp(metadata.image),
+        });
+      } catch (e) {
+        console.error("Error loading NFT", e);
+      }
+    }
+
+    loadNFT();
+  }, [memberState]);
+
+  const currentRole = Number(memberState.role);
+  const roleChanged = selectedRole !== currentRole;
+
+  // ── JSX ──
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        {/* ── Header ── */}
+        {/* Header */}
         <button className={styles.modalClose} onClick={onClose}>
           ✕
         </button>
         <div className={styles.modalTitle}>⚔ Member Info</div>
 
-        {/* ── Address ── */}
+        {/* Address */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Address</span>
-          <span className={styles.formLabelBig}>{member.addressMember}</span>
-        </div>
-
-        {/* ── Guild ── */}
-        <div className={styles.formGroup}>
-          <span className={styles.formLabel}>Guild</span>
           <span className={styles.formLabelBig}>
-            {guild.name} - {guild.id}
+            {memberState.addressMember}
           </span>
         </div>
 
-        {/* ── Role selector ── */}
+        {/* Guild */}
+        <div className={styles.formGroup}>
+          <span className={styles.formLabel}>Guild</span>
+          <span className={styles.formLabelBig}>
+            {guild?.name} - {guild?.id}
+          </span>
+        </div>
+
+        {/* Role selector */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>
             Role — current: {roleNames[currentRole]}
@@ -119,7 +166,21 @@ export default function MemberModal({
           </select>
         </div>
 
-        {/* ── Actions ── */}
+        {/* NFT */}
+        {nft && (
+          <div className={styles.formGroup}>
+            <span className={styles.formLabel}>NFT</span>
+            <img
+              src={nft.image}
+              alt={nft.name || "NFT"}
+              width={50}
+              height={50}
+              style={{ borderRadius: "8px" }}
+            />
+          </div>
+        )}
+
+        {/* Actions */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Actions</span>
           <div className={styles.container}>

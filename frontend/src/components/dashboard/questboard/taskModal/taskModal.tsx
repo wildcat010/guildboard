@@ -208,31 +208,27 @@ export default function TaskModal({
         {/* ── Status ── */}
         <div className={styles.formGroup}>
           <span className={styles.formLabel}>Status</span>
-          {guildSelection ? (
-            <span>{taskStatus[task.status]}</span>
-          ) : (
-            <select
-              className={styles.statusSelect}
-              value={Number(editedTask.taskStatus)}
-              disabled={guildSelection || isTaskClosed}
-              onChange={(e) =>
-                setEditedTask({
-                  ...editedTask,
-                  taskStatus: Number(e.target.value),
-                })
-              }
-            >
-              {Object.entries(taskStatus).map(([value, label]) => (
-                <option
-                  key={Number(value)}
-                  value={Number(value)}
-                  disabled={Number(value) === 4}
-                >
-                  {label}
-                </option>
-              ))}
-            </select>
-          )}
+          <select
+            className={styles.statusSelect}
+            value={Number(editedTask.taskStatus)}
+            disabled={!guildSelection && isTaskClosed}
+            onChange={(e) =>
+              setEditedTask({
+                ...editedTask,
+                taskStatus: Number(e.target.value),
+              })
+            }
+          >
+            {Object.entries(taskStatus).map(([value, label]) => (
+              <option
+                key={Number(value)}
+                value={Number(value)}
+                disabled={Number(value) === 4}
+              >
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className={styles.formGroup}>

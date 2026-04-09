@@ -11,7 +11,7 @@ import GuildMembers from "./../../dashboard/guildMembers/guildMembers";
 import Payments from "./../../dashboard/payments/payments";
 import Members from "./../../dashboard/members/members";
 import MyGuild from "./myGuild/MyGuild";
-import NFT from "../NFT/NFT";
+import Settings from "../Settings/Settings";
 
 type ContentProps = {
   activeSection: Section;
@@ -27,8 +27,7 @@ export default function Content({ activeSection }: ContentProps) {
       {activeSection === "guildMembers" && <GuildMembers />}
       {activeSection === "members" && <Members />}
       {activeSection === "payments" && <Payments />}
-      {activeSection === "mynft" && <NFT />}
-      {activeSection === "payments" && <Settings />}
+      {activeSection === "settings" && <Settings />}
     </div>
   );
 }
