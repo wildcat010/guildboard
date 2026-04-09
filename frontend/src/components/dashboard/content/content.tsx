@@ -11,6 +11,7 @@ import GuildMembers from "./../../dashboard/guildMembers/guildMembers";
 import Payments from "./../../dashboard/payments/payments";
 import Members from "./../../dashboard/members/members";
 import MyGuild from "./myGuild/MyGuild";
+import NFT from "../NFT/NFT";
 
 type ContentProps = {
   activeSection: Section;
