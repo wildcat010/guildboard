@@ -1,8 +1,8 @@
 "use client";
-import Image from "next/image";
+
 import styles from "./Settings.module.css";
-import Link from "next/link";
-import { useState, useEffect, use } from "react";
+
+import { useEffect } from "react";
 import { useGuild } from "@/hooks/useGuild";
 
 import { Guild, Member, Task } from "../../../constants/constants";
