@@ -210,6 +210,18 @@ Initializable
         emit Deposited(totalDeposited, msg.value);
     }
 
+    function withdrawTo(address payable to, uint256 amount)
+    external
+    onlyOwner
+    nonReentrant
+{
+    require(address(this).balance >= amount, "GuildBoard: insufficient balance");
+    require(to != address(0), "GuildBoard: invalid address");
+
+    (bool success, ) = to.call{value: amount}("");
+    require(success, "GuildBoard: transfer failed");
+}
+
 
     function closeAndPayTask(uint256 taskId) external onlyOwner taskExists(taskId) nonReentrant whenNotPaused
     {

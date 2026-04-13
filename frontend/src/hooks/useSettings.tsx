@@ -6,7 +6,7 @@ import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
 export function useSettings() {
   const { isConnected } = useAccount();
 
-  const { data: isPaused } = useReadContract({
+  const { data: isPaused, refetch: refetchIsPaused } = useReadContract({
     address: GUILDBOARD_ADDRESS,
     abi: GUILDBOARD_ABI,
     functionName: "paused",
@@ -15,5 +15,6 @@ export function useSettings() {
 
   return {
     isPaused,
+    refetchIsPaused,
   };
 }

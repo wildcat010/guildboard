@@ -54,12 +54,7 @@ export default function Sidebar({
         >
           <span className="icon">💰</span> Payments
         </button>
-        <button
-          className={`${styles.sidebarItem} ${activeSection === "mynft" ? styles.active : ""}`}
-          onClick={() => onSectionChange("mynft")}
-        >
-          <span className="icon">🛡</span> My NFT
-        </button>
+
         <button
           className={`${styles.sidebarItem} ${activeSection === "settings" ? styles.active : ""}`}
           onClick={() => onSectionChange("settings")}

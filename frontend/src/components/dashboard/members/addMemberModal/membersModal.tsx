@@ -32,7 +32,7 @@ export default function MembersModal({ onClose }: MembersModalProps) {
 
   const { guilds } = useGuild();
   const guildsArray =
-    (guilds as Guild[]).filter((guild) => guild.active == true) ?? [];
+    (guilds as Guild[])?.filter((guild) => guild.active == true) ?? [];
 
   useEffect(() => {
     if (isMemberSuccess && pendingClose.current) {

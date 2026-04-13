@@ -53,7 +53,7 @@ export default function TaskModal({
 
   const { guilds } = useGuild();
   const guildsArray =
-    (guilds as Guild[]).filter((guild) => guild.active === true) ?? [];
+    (guilds as Guild[])?.filter((guild) => guild.active === true) ?? [];
 
   useEffect(() => {
     if (isTaskStatusSuccess) {

@@ -2,26 +2,31 @@
 
 import styles from "./Settings.module.css";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGuild } from "@/hooks/useGuild";
 
 import { Guild, Member, Task } from "../../../constants/constants";
 import { GUILDBOARD_ADDRESS } from "@/contracts";
-import { useBalance } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import { useMember } from "@/hooks/useMember";
 import { useTask } from "@/hooks/useTask";
 import { useSettings } from "@/hooks/useSettings";
 import { useShutdownActions } from "@/hooks/useShutdownActions";
+import { Withdrawal } from "./withdrawal/withdrawal";
 
 export default function Settings() {
   const { data: balance, refetch: refetchBalance } = useBalance({
     address: GUILDBOARD_ADDRESS,
   });
 
+  const { address } = useAccount();
+
+  const [withdrawalModal, setWithdrawalModal] = useState(false);
+
   const { guilds } = useGuild();
   const { getAllMembers } = useMember();
   const { getAllTasks } = useTask();
-  const { isPaused } = useSettings();
+  const { isPaused, refetchIsPaused } = useSettings();
   const {
     enableShutdown,
     disableShutdown,
@@ -47,8 +52,13 @@ export default function Settings() {
     }
   };
 
+  const emergencyWithdrawal = () => {
+    setWithdrawalModal(true);
+  };
+
   useEffect(() => {
     if (isEnableShutdownSuccess || isDisableShutdownSuccess) {
+      refetchIsPaused();
     }
   }, [isEnableShutdownSuccess, isDisableShutdownSuccess]);
 
@@ -60,6 +70,10 @@ export default function Settings() {
           <div>
             <div className={styles.pageTitle}>Settings - Quick Dashboard</div>
           </div>
+        </div>
+        <div className={styles.pageSub}>
+          Owner
+          <p className={styles.text}>{address}</p>
         </div>
         <div className={styles.container}>
           <div className={styles.pageSub}>
@@ -107,7 +121,27 @@ export default function Settings() {
               ? "Deactivate the Contract"
               : "Activate the Contract"}
         </button>
+        <div className={`${styles.pageHeader} ${styles.animateIn}`}>
+          <div>
+            <div className={styles.pageTitle}>
+              Settings - Emergency Withdrawal
+            </div>
+          </div>
+        </div>
+        <button className={styles.btnPrimary} onClick={emergencyWithdrawal}>
+          Emergency Withdrawal
+        </button>
       </div>
+      {withdrawalModal && (
+        <Withdrawal
+          onClose={() => {
+            setWithdrawalModal(false);
+          }}
+          balance={balance}
+          owner={address}
+          refetchBalance={refetchBalance}
+        />
+      )}
     </>
   );
 }

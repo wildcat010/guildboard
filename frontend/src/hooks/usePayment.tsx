@@ -19,10 +19,30 @@ export function usePayment() {
     });
   }
 
+  const {
+    writeContract: writeWithdrawal,
+    isPending: isWithdrawalPending,
+    isSuccess: isWithdrawalSuccess,
+    isError: isWithdrawalError,
+  } = useWriteContract();
+
+  function withdrawTo(to: string, amount: bigint) {
+    writeWithdrawal({
+      address: GUILDBOARD_ADDRESS,
+      abi: GUILDBOARD_ABI,
+      functionName: "withdrawTo",
+      args: [to, amount],
+    });
+  }
+
   return {
     isPaidTaskPending,
     isPaidTaskSuccess,
     isPaidTaskError,
     paidAndCloseQuest,
+    withdrawTo,
+    isWithdrawalPending,
+    isWithdrawalSuccess,
+    isWithdrawalError,
   };
 }
