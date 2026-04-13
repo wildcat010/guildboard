@@ -229,6 +229,8 @@ npm run deploy:sepolia
 ```bash
 cd contracts
 npm run verify:sepolia
+OR
+npx hardhat verify --network sepolia <IMPLEMENTATION_ADDRESS>
 ```
 
 After deployment, copy contract addresses to `frontend/.env.local`:
