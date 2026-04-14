@@ -1,5 +1,5 @@
 "use client";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
 import { useEffect } from "react";
 
@@ -7,9 +7,16 @@ export function useTaskManagement() {
   const {
     writeContract: writeCreateTask,
     isPending: isTaskCreatePending,
-    isSuccess: isTaskCreateSuccess,
-    isError: isTaskCreateError,
+    data: taskCreateHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isTaskCreateConfirming,
+    isSuccess: isTaskCreateConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: taskCreateHash,
+    confirmations: 1,
+  });
 
   const {
     writeContract: writeUpdateTask,
@@ -90,12 +97,9 @@ export function useTaskManagement() {
   return {
     createTask,
     isTaskCreatePending,
-    isTaskCreateSuccess,
-    isTaskCreateError,
-    // ✅ aliases for backward compat with AddTaskModal
     isTaskPending: isTaskCreatePending,
-    isTaskSuccess: isTaskCreateSuccess,
-    isTaskError: isTaskCreateError,
+    isTaskCreateConfirming,
+    isTaskCreateConfirmed,
     updateTask,
     isTaskUpdatePending,
     isTaskUpdateSuccess,

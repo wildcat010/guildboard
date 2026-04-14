@@ -14,23 +14,26 @@ export default function AddGuildModal({
   onSuccess,
 }: AddGuildModalProps) {
   const [guildName, setGuildName] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  const { createGuild, isGuildPending, isGuildSuccess } = useManagementGuild();
+  const { createGuild, isGuildPending, isGuildConfirming, isGuildConfirmed } =
+    useManagementGuild();
 
   useEffect(() => {
-    if (isGuildSuccess) {
+    if (submitted && isGuildConfirmed) {
       onClose();
       onSuccess();
     }
-  }, [isGuildSuccess]);
+  }, [submitted, isGuildConfirmed]);
 
   function handleSubmit() {
-    if (isGuildSuccess) {
+    if (isGuildConfirmed) {
       onClose();
       return;
     }
     if (!guildName.trim()) return;
-    createGuild(guildName);
+    setSubmitted(true);
+    createGuild(guildName.trim());
   }
 
   return (
@@ -47,12 +50,25 @@ export default function AddGuildModal({
               type="text"
               value={guildName}
               onChange={(e) => setGuildName(e.target.value)}
+              disabled={isGuildPending || isGuildConfirming}
             />
           </div>
           <div className={styles.modalFooter}>
-            <button onClick={onClose}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isGuildPending}>
-              {isGuildPending ? "Creating..." : "Create Guild"}
+            <button
+              onClick={onClose}
+              disabled={isGuildPending || isGuildConfirming}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={isGuildPending || isGuildConfirming}
+            >
+              {isGuildPending
+                ? "Submitting..."
+                : isGuildConfirming
+                  ? "Confirming on Sepolia..."
+                  : "Create Guild"}
             </button>
           </div>
         </div>

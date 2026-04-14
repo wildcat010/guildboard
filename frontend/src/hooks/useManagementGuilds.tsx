@@ -1,28 +1,42 @@
 "use client";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 
 export function useManagementGuild() {
   const {
     writeContract: writeGuild,
     isPending: isGuildPending,
-    isSuccess: isGuildSuccess,
-    isError: isGuildError,
+    data: guildHash,
   } = useWriteContract();
+
+  const { isLoading: isGuildConfirming, isSuccess: isGuildConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: guildHash,
+    });
 
   const {
     writeContract: writeMember,
     isPending: isMemberPending,
-    isSuccess: isMemberSuccess,
-    isError: isMemberError,
+    data: memberHash,
   } = useWriteContract();
+
+  const { isLoading: isMemberConfirming, isSuccess: isMemberConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: memberHash,
+    });
 
   const {
     writeContract: writeStatusGuild,
     isPending: isStatusGuildPending,
-    isSuccess: isStatusGuildSuccess,
-    isError: isStatusGuildError,
+    data: guildStatusHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isStatusGuildConfirming,
+    isSuccess: isStatusGuildConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: guildStatusHash,
+  });
 
   function enableStatus(guildId: number) {
     writeStatusGuild({
@@ -73,15 +87,16 @@ export function useManagementGuild() {
   return {
     createGuild,
     isGuildPending,
-    isGuildSuccess,
-    isGuildError,
     mintMember,
     isMemberPending,
-    isMemberSuccess,
-    isMemberError,
+    isMemberConfirmed,
+    isMemberConfirming,
     enableStatus,
     disableStatus,
-    isStatusGuildSuccess,
+    isStatusGuildConfirmed,
+    isStatusGuildConfirming,
     isStatusGuildPending,
+    isGuildConfirming,
+    isGuildConfirmed,
   };
 }

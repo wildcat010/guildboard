@@ -1,21 +1,32 @@
 "use client";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { GUILD_NFT_ADDRESS, GUILD_NFT_ABI } from "@/contracts";
 
 export function useManagementMember() {
   const {
     writeContract: writeUpgradeMember,
     isPending: isUpgradingPending,
-    isSuccess: isUpgradingSuccess,
-    isError: isUpgradingError,
+    data: upgradeMemberHash,
   } = useWriteContract();
+
+  const { isLoading: isUpgradingConfirming, isSuccess: isUpgradingConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: upgradeMemberHash,
+      confirmations: 1,
+    });
 
   const {
     writeContract: writeRemoveMember,
     isPending: isRemoveMemberPending,
-    isSuccess: isRemoveMemberSuccess,
-    isError: isRemoveMemberError,
+    data: removeMemberHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isRemoveMemberConfirming,
+    isSuccess: isRemoveMemberConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: removeMemberHash,
+  });
 
   function upgradeMember(guildId: number, newRole: number) {
     writeUpgradeMember({
@@ -37,12 +48,12 @@ export function useManagementMember() {
 
   return {
     isUpgradingPending,
-    isUpgradingSuccess,
-    isUpgradingError,
+    isUpgradingConfirmed,
+    isUpgradingConfirming,
     upgradeMember,
     isRemoveMemberPending,
-    isRemoveMemberSuccess,
-    isRemoveMemberError,
+    isRemoveMemberConfirmed,
+    isRemoveMemberConfirming,
     removeMember,
   };
 }

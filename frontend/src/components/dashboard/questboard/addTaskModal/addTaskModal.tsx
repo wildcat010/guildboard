@@ -1,7 +1,7 @@
 "use client";
 import { useTask } from "@/hooks/useTask";
 import styles from "./addTaskModal.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTaskManagement } from "@/hooks/useTaskManagement";
 import { parseUnits } from "ethers";
 
@@ -17,22 +17,30 @@ export default function AddTaskModal({
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [reward, setReward] = useState("");
-  const { isTaskPending, isTaskSuccess, isTaskError, createTask } =
-    useTaskManagement();
+  const {
+    isTaskPending,
+    isTaskCreateConfirmed,
+    isTaskCreateConfirming,
+    createTask,
+  } = useTaskManagement();
+
+  const createQuest = useRef(false);
 
   useEffect(() => {
-    if (isTaskSuccess) {
+    if (isTaskCreateConfirmed && createQuest.current) {
+      createQuest.current = false;
       refetchAllTasks();
       onClose();
     }
-  }, [isTaskSuccess]);
+  }, [isTaskCreateConfirmed, refetchAllTasks, onClose]);
 
   function handleSubmit() {
-    if (isTaskSuccess) {
+    if (isTaskCreateConfirmed || isTaskCreateConfirming) {
       onClose();
       return;
     }
     if (!taskName.trim() || Number(reward) == 0) return;
+    createQuest.current = true;
     createTask(taskName, description, parseUnits(reward, "gwei"));
   }
 
@@ -49,6 +57,7 @@ export default function AddTaskModal({
             <input
               type="text"
               value={taskName}
+              disabled={isTaskPending || isTaskCreateConfirming}
               onChange={(e) => setTaskName(e.target.value)}
             />
           </div>
@@ -57,6 +66,7 @@ export default function AddTaskModal({
             <input
               type="text"
               value={description}
+              disabled={isTaskPending || isTaskCreateConfirming}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
@@ -66,13 +76,21 @@ export default function AddTaskModal({
               type="number"
               placeholder="e.g. 100000000 (GWEI) - 0.1 ETH"
               value={reward}
+              disabled={isTaskPending || isTaskCreateConfirming}
               onChange={(e) => setReward(e.target.value)}
             />
           </div>
           <div className={styles.modalFooter}>
             <button onClick={onClose}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isTaskPending}>
-              {isTaskPending ? "Creating..." : "Create Task"}
+            <button
+              onClick={handleSubmit}
+              disabled={isTaskPending || isTaskCreateConfirming}
+            >
+              {isTaskPending
+                ? "Confirm in MetaMask..."
+                : isTaskCreateConfirming
+                  ? "Confirming on Sepolia..."
+                  : "Create Task"}
             </button>
           </div>
         </div>

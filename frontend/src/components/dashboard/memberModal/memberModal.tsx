@@ -33,6 +33,7 @@ export default function MemberModal({
     image: string;
   }>();
   const pendingClose = useRef(false);
+  const pendingUpgrade = useRef(false);
 
   // ── Hooks ──
   const {
@@ -40,8 +41,10 @@ export default function MemberModal({
     removeMember,
     isUpgradingPending,
     isRemoveMemberPending,
-    isUpgradingSuccess,
-    isRemoveMemberSuccess,
+    isUpgradingConfirming,
+    isUpgradingConfirmed,
+    isRemoveMemberConfirmed,
+    isRemoveMemberConfirming,
   } = useManagementMember();
 
   const { refetchGuilds } = useGuild();
@@ -62,6 +65,7 @@ export default function MemberModal({
 
   // ── Actions ──
   function handleUpgrade() {
+    pendingUpgrade.current = true;
     upgradeMember(Number(memberState.id), selectedRole);
   }
 
@@ -73,7 +77,7 @@ export default function MemberModal({
   // ── Effects ──
   // Handle delete
   useEffect(() => {
-    if (isRemoveMemberSuccess && pendingClose.current) {
+    if (isRemoveMemberConfirmed && pendingClose.current) {
       pendingClose.current = false;
       refetchGuilds();
       refetchGuildMembers();
@@ -81,21 +85,38 @@ export default function MemberModal({
       onClose();
     }
   }, [
-    isRemoveMemberSuccess,
+    isRemoveMemberConfirmed,
     refetchGuilds,
     refetchGuildMembers,
     onClose,
     onDeleteSuccess,
   ]);
 
+  useEffect(() => {
+    setMemberState(member);
+    setSelectedRole(Number(member.role));
+  }, [member]);
+
   // Handle upgrade
   useEffect(() => {
-    if (isUpgradingSuccess) {
+    if (isUpgradingConfirmed && pendingUpgrade.current) {
+      pendingUpgrade.current = false;
+      setMemberState((prev) => ({
+        ...prev,
+        role: selectedRole as Member["role"],
+      }));
+
       refetchGuildMembers();
       refetchAllMember();
       refetchMember();
     }
-  }, [isUpgradingSuccess, refetchGuildMembers, refetchMember]);
+  }, [
+    isUpgradingConfirmed,
+    selectedRole,
+    refetchGuildMembers,
+    refetchMember,
+    refetchAllMember,
+  ]);
 
   // Load NFT metadata
   useEffect(() => {
@@ -156,6 +177,12 @@ export default function MemberModal({
           <select
             className={styles.select}
             value={selectedRole}
+            disabled={
+              isUpgradingPending ||
+              isUpgradingConfirming ||
+              isRemoveMemberPending ||
+              isRemoveMemberConfirming
+            }
             onChange={(e) => setSelectedRole(Number(e.target.value))}
           >
             {Object.entries(roleNames).map(([value, label]) => (
@@ -187,18 +214,26 @@ export default function MemberModal({
             <button
               className={styles.button}
               onClick={handleDelete}
-              disabled={isRemoveMemberPending}
+              disabled={isRemoveMemberPending || isRemoveMemberConfirming}
             >
-              {isRemoveMemberPending ? "🗑 Deleting..." : "🗑 Delete"}
+              {isRemoveMemberPending
+                ? "🗑 Confirm in MetaMask..."
+                : isRemoveMemberConfirming
+                  ? "🗑 Confirming on Sepolia..."
+                  : "🗑 Delete"}
             </button>
 
             {roleChanged && (
               <button
                 className={styles.button}
                 onClick={handleUpgrade}
-                disabled={isUpgradingPending}
+                disabled={isUpgradingPending || isUpgradingConfirming}
               >
-                {isUpgradingPending ? "⬆ Upgrading..." : "⬆ Upgrade"}
+                {isUpgradingPending
+                  ? "⬆ Confirm in MetaMask..."
+                  : isUpgradingConfirming
+                    ? "⬆ Confirming on Sepolia..."
+                    : "⬆ Upgrade"}
               </button>
             )}
           </div>

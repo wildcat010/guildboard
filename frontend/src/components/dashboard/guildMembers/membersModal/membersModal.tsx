@@ -8,6 +8,7 @@ import { useGuild } from "@/hooks/useGuild";
 
 type MembersModalProps = {
   onClose: () => void;
+  onSuccess: () => void;
   listMembers: number[];
   active: boolean;
   guildCard: Guild;
@@ -16,6 +17,7 @@ type MembersModalProps = {
 export default function MembersModal({
   onClose,
   listMembers,
+  onSuccess,
   active,
   guildCard,
 }: MembersModalProps) {
@@ -26,7 +28,8 @@ export default function MembersModal({
     enableStatus,
     disableStatus,
     isStatusGuildPending,
-    isStatusGuildSuccess,
+    isStatusGuildConfirmed,
+    isStatusGuildConfirming,
   } = useManagementGuild();
 
   const { refetchCounterActive, refetchCounterInactive } = useGuild();
@@ -42,14 +45,14 @@ export default function MembersModal({
   };
 
   useEffect(() => {
-    if (isStatusGuildSuccess && pendingStatus.current !== null) {
+    if (isStatusGuildConfirmed && pendingStatus.current !== null) {
       setActiveGuild(pendingStatus.current);
       refetchGuilds();
       refetchCounterActive();
       refetchCounterInactive();
       pendingStatus.current = null;
     }
-  }, [isStatusGuildSuccess]);
+  }, [isStatusGuildConfirmed]);
 
   return (
     <div className={styles.modalOverlay}>
@@ -75,15 +78,17 @@ export default function MembersModal({
           <span className={styles.toggleLabel}>Status</span>
           <button
             className={`${styles.toggle} ${activeGuild ? styles.toggleActive : styles.toggleInactive}`}
-            disabled={isStatusGuildPending}
+            disabled={isStatusGuildPending || isStatusGuildConfirming}
           >
             <div className={styles.toggleThumb} />
             <span className={styles.toggleText}>
               {isStatusGuildPending
                 ? "Pending..."
-                : activeGuild
-                  ? "Active"
-                  : "Inactive"}
+                : isStatusGuildConfirming
+                  ? "Confirming on Sepolia..."
+                  : activeGuild
+                    ? "Active"
+                    : "Inactive"}
             </span>
           </button>
         </div>

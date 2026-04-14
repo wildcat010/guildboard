@@ -4,6 +4,7 @@ import styles from "./guildCard.module.css";
 import { useState } from "react";
 import MembersModal from "./../membersModal/membersModal";
 import { useGuildById } from "@/hooks/useGuildById";
+import { useMember } from "@/hooks/useMember";
 
 type GuildCardProps = {
   guildCard: Guild;
@@ -12,6 +13,12 @@ type GuildCardProps = {
 export default function GuildCard({ guildCard }: GuildCardProps) {
   const [showModal, setShowModal] = useState(false);
   const { guildMembers } = useGuildById(Number(guildCard.id));
+  const { refetchAllMember } = useMember();
+
+  const onSuccess = () => {
+    refetchAllMember();
+  };
+
   return (
     <>
       <div
@@ -39,6 +46,7 @@ export default function GuildCard({ guildCard }: GuildCardProps) {
           active={guildCard.active}
           guildCard={guildCard}
           onClose={() => setShowModal(false)}
+          onSuccess={onSuccess}
         />
       )}
     </>

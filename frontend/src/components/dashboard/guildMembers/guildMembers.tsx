@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./guildMembers.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Guild } from "./../../../constants/constants";
 import GuildCard from "./GuildCard/guildCard";
 import AddGuildModal from "./addGuildModal/addGuildModal";
@@ -12,6 +12,7 @@ export default function AddMemberModal() {
 
   const {
     guilds,
+
     refetchGuilds,
     refetchGuildsCount,
     refetchGuildsLimit,
@@ -39,7 +40,7 @@ export default function AddMemberModal() {
       <div className={`${styles.pageHeader} ${styles.animateIn}`}>
         <div>
           <div className={styles.pageTitle}>
-            Guilds - All {guildCount as number}/Active{" "}
+            Guilds - All {(guildCount as number) ?? 0}/Active{" "}
             {Number(activeGuildCount ?? 0)}/ Inactive{" "}
             {Number(inactiveGuildCount ?? 0)}
           </div>

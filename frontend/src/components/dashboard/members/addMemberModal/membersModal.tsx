@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from "react";
 import { useGuild } from "@/hooks/useGuild";
 import { useManagementGuild } from "@/hooks/useManagementGuilds";
 import { PinataSDK } from "pinata";
-import { useMember } from "@/hooks/useMember";
 
 const pinata = new PinataSDK({
   pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT!,
@@ -14,9 +13,13 @@ const pinata = new PinataSDK({
 
 type MembersModalProps = {
   onClose: () => void;
+  onSuccess?: () => void;
 };
 
-export default function MembersModal({ onClose }: MembersModalProps) {
+export default function MembersModal({
+  onClose,
+  onSuccess,
+}: MembersModalProps) {
   const [memberName, setMemberName] = useState("");
   const [addressMember, setAddressMember] = useState("");
   const [selectedGuildId, setSelectedGuildId] = useState("");
@@ -26,21 +29,20 @@ export default function MembersModal({ onClose }: MembersModalProps) {
 
   const pendingClose = useRef(false);
 
-  const { mintMember, isMemberPending, isMemberSuccess, isMemberError } =
+  const { mintMember, isMemberPending, isMemberConfirming, isMemberConfirmed } =
     useManagementGuild();
-  const { refetchAllMember } = useMember();
 
   const { guilds } = useGuild();
   const guildsArray =
     (guilds as Guild[])?.filter((guild) => guild.active == true) ?? [];
 
   useEffect(() => {
-    if (isMemberSuccess && pendingClose.current) {
+    if (isMemberConfirmed && pendingClose.current) {
       pendingClose.current = false;
-      refetchAllMember();
+      onSuccess?.();
       onClose();
     }
-  }, [isMemberSuccess, onClose]);
+  }, [isMemberConfirmed, onClose, onSuccess]);
 
   async function handleSubmit() {
     if (
@@ -151,7 +153,9 @@ export default function MembersModal({ onClose }: MembersModalProps) {
               ? "Uploading to IPFS..."
               : isMemberPending
                 ? "Confirm in MetaMask..."
-                : "Create Member"}
+                : isMemberConfirming
+                  ? "Confirming on Sepolia..."
+                  : "Create Member"}
           </button>
         </div>
       </div>

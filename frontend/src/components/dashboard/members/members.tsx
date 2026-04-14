@@ -7,11 +7,17 @@ import { Guild, Section } from "./../../../constants/constants";
 import { useGuild } from "@/hooks/useGuild";
 import AddMemberModal from "./addMemberModal/membersModal";
 import MembersTable from "./membersTable/membersTable";
+import { useMember } from "@/hooks/useMember";
 
 export default function GuildMembers() {
   const [showModal, setShowModal] = useState(false);
   const { guilds } = useGuild();
   const guildsArray = (guilds as Guild[]) ?? [];
+  const { refetchAllMember } = useMember();
+
+  const onSuccess = () => {
+    refetchAllMember();
+  };
 
   return (
     <div className={styles.content}>
@@ -27,7 +33,12 @@ export default function GuildMembers() {
         </button>
       </div>
       <MembersTable></MembersTable>
-      {showModal && <AddMemberModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <AddMemberModal
+          onClose={() => setShowModal(false)}
+          onSuccess={onSuccess}
+        />
+      )}
     </div>
   );
 }
