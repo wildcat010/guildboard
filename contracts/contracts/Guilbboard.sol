@@ -152,6 +152,7 @@ Initializable
     string memory description,
     uint256 reward,
     uint256 guildId,
+    TaskStatus newStatus,
     address payable  assignee
 ) external onlyOwner taskExists(taskId) whenNotPaused {
     Task storage myTask = _TaskIDs[taskId];
@@ -161,6 +162,7 @@ Initializable
     myTask.name = name;
     myTask.description = description;
     myTask.reward = reward;
+    myTask.status = newStatus;
     myTask.assignee = assignee;
 
     if (guildId != myTask.guildId) {

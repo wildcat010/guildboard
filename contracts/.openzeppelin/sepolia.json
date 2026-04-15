@@ -30,6 +30,16 @@
       "address": "0xe56979a1A85CFf8567EAb4A2C8c42464ddF0769a",
       "txHash": "0xa40496952bc7f25979de021264a3b1f23b15db256ed080b90a33ddce4c4cbc3d",
       "kind": "uups"
+    },
+    {
+      "address": "0x1D77821505c4ee98F3771D09B5481cdD07cA79cd",
+      "txHash": "0xa7fee9964d77cdd920e71a19bcb094892ba96108456c3a89cfd7dc47dea73086",
+      "kind": "uups"
+    },
+    {
+      "address": "0x9ea6faDE07c552D7336E4902afF38DA5429e0872",
+      "txHash": "0x19b7756af699808b65a562e8a7bf26475f65d60a642c345fe7b1b9d110765b80",
+      "kind": "uups"
     }
   ],
   "impls": {
@@ -1530,6 +1540,304 @@
     "47135d258b9b1c44dc225cea7e1e4b44d77426efc5bfe3b793ef490c8f7b3994": {
       "address": "0x990e6A2dD51534a7F504d454015D27699B9DD1BF",
       "txHash": "0x28db3b8ef7a41ce97033660c0776babc7973da626a239079cae0b589b0ef0b2e",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "_guildTasks",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:59"
+          },
+          {
+            "label": "_guildPayements",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:60"
+          },
+          {
+            "label": "deposits",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_uint256,t_struct(Depo)9708_storage)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:61"
+          },
+          {
+            "label": "_TaskIDs",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(Task)9699_storage)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:62"
+          },
+          {
+            "label": "tasksCreated",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:64"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:65"
+          },
+          {
+            "label": "guildNFT",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_contract(IGuildNFT)9663",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:70"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)692_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(OwnableStorage)13_storage": {
+            "label": "struct OwnableUpgradeable.OwnableStorage",
+            "members": [
+              {
+                "label": "_owner",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)450_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IGuildNFT)9663": {
+            "label": "contract IGuildNFT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(TaskStatus)9679": {
+            "label": "enum Guildboard.TaskStatus",
+            "members": [
+              "toDo",
+              "inProgress",
+              "Done",
+              "Verified",
+              "Close"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(uint256 => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Depo)9708_storage)": {
+            "label": "mapping(uint256 => struct Guildboard.Depo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Task)9699_storage)": {
+            "label": "mapping(uint256 => struct Guildboard.Task)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Depo)9708_storage": {
+            "label": "struct Guildboard.Depo",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "date",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(Task)9699_storage": {
+            "label": "struct Guildboard.Task",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(TaskStatus)9679",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "poster",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              },
+              {
+                "label": "assignee",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "guildId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "reward",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "paid",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\PausableUpgradeable.sol:21",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Ownable": [
+            {
+              "contract": "OwnableUpgradeable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "1aa76fb848ab0b0031c08d86938a5006d9bfe39363c61fe05443f580fe7c5287": {
+      "address": "0x6d4BE7AeCb6A9d242060CD7835B5Cf81C2f0d179",
+      "txHash": "0x0584ec6dc81bc1b32cac703eea22e2c7b693e0a39084b22f9d99d4667c3c14fe",
       "layout": {
         "solcVersion": "0.8.28",
         "storage": [

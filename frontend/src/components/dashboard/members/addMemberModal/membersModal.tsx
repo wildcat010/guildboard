@@ -27,8 +27,6 @@ export default function MembersModal({
   const [imagePreview, setImagePreview] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
 
-  const pendingClose = useRef(false);
-
   const { mintMember, isMemberPending, isMemberConfirming, isMemberConfirmed } =
     useManagementGuild();
 
@@ -37,8 +35,7 @@ export default function MembersModal({
     (guilds as Guild[])?.filter((guild) => guild.active == true) ?? [];
 
   useEffect(() => {
-    if (isMemberConfirmed && pendingClose.current) {
-      pendingClose.current = false;
+    if (isMemberConfirmed) {
       onSuccess?.();
       onClose();
     }
@@ -65,7 +62,6 @@ export default function MembersModal({
       });
 
       const tokenURI = `ipfs://${metadataResult.cid}`;
-      pendingClose.current = true;
       mintMember(
         memberName,
         addressMember,
@@ -74,7 +70,6 @@ export default function MembersModal({
       );
     } catch (err) {
       console.error("Upload failed:", err);
-      pendingClose.current = false;
     } finally {
       setIsUploading(false);
     }

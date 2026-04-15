@@ -26,6 +26,13 @@ GuildBoard solves this by:
 
 ### Smart Contracts
 
+- **Two upgradeable UUPS contracts — GuildNFT and Guildboard**
+  - Two upgradeable UUPS contracts — GuildNFT and Guildboard
+  - GuildNFT manages guild and member lifecycle as ERC721 tokens
+  - Guildboard handles task creation, assignment, status tracking, ETH deposits and payouts
+  - Security patterns: ReentrancyGuard, Pausable, Ownable, nonReentrant
+  - Full test suite with Hardhat + Mocha/Chai
+
 - **GuildNFT (ERC-721 Upgradeable)**
   - Create/disable/enable/remove guilds
   - Mint member NFTs
@@ -45,6 +52,9 @@ GuildBoard solves this by:
 - Dashboard sections for guild/task/member management
 - Contract settings page (contract state + pause controls)
 - Read/write hooks for blockchain interactions
+- Real-time blockchain state with useReadContract and useWaitForTransactionReceipt for Sepolia confirmation handling
+- Role-based UI — admin view vs guild member view
+- Deployed on Azure Static Web Apps
 
 ## Tech Stack
 

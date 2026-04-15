@@ -46,9 +46,11 @@ export default function TaskModal({
     updateTask,
     updateTaskStatus,
     isTaskUpdatePending,
-    isTaskUpdateSuccess,
-    isTaskStatusPending,
-    isTaskStatusSuccess,
+    isTaskUpdateConfirming,
+    isTaskUpdateConfirmed,
+    isUpdateTaskStatusPending,
+    isUpdateTaskStatusConfirming,
+    isUpdateTaskStatusConfirmed,
   } = useTaskManagement();
 
   const { guilds } = useGuild();
@@ -56,25 +58,18 @@ export default function TaskModal({
     (guilds as Guild[])?.filter((guild) => guild.active === true) ?? [];
 
   useEffect(() => {
-    if (isTaskStatusSuccess) {
+    if (isUpdateTaskStatusConfirmed) {
       refetchAllTasks();
       onClose();
     }
-  }, [isTaskStatusSuccess, refetchAllTasks, onClose]);
+  }, [isUpdateTaskStatusConfirmed, refetchAllTasks, onClose]);
 
   useEffect(() => {
-    if (isTaskUpdateSuccess) {
+    if (isTaskUpdateConfirmed) {
       refetchAllTasks();
-
       onClose();
     }
-  }, [
-    isTaskUpdateSuccess,
-    refetchAllTasks,
-    onClose,
-    editedTask.assignee,
-    task,
-  ]);
+  }, [isTaskUpdateConfirmed, refetchAllTasks, onClose]);
 
   const handleUpdate = () => {
     if (guildSelection) {
@@ -84,6 +79,7 @@ export default function TaskModal({
         editedTask.description,
         parseEther(editedTask.reward),
         editedTask.guildId ?? 0,
+        editedTask.taskStatus,
         editedTask.assignee as `0x${string}`,
       );
     } else {
@@ -101,7 +97,7 @@ export default function TaskModal({
     return <span>{guild?.name ?? `Guild #${Number(guildId)}`}</span>;
   }
 
-  const isPending = isTaskUpdatePending || isTaskStatusPending;
+  const isBusy = isTaskUpdatePending || isTaskUpdateConfirming;
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -128,7 +124,7 @@ export default function TaskModal({
           <span className={styles.formLabel}>Name</span>
           {guildSelection ? (
             <input
-              disabled={!guildSelection || isTaskClosed}
+              disabled={!guildSelection || isTaskClosed || isBusy}
               className={styles.rewardInput}
               type="text"
               value={editedTask.name}
@@ -146,7 +142,7 @@ export default function TaskModal({
           <span className={styles.formLabel}>Description</span>
           {guildSelection ? (
             <textarea
-              disabled={!guildSelection || isTaskClosed}
+              disabled={!guildSelection || isTaskClosed || isBusy}
               className={styles.descriptionArea}
               value={editedTask.description}
               onChange={(e) =>
@@ -163,7 +159,7 @@ export default function TaskModal({
           <span className={styles.formLabel}>Reward (ETH)</span>
           {guildSelection ? (
             <input
-              disabled={!guildSelection || isTaskClosed}
+              disabled={!guildSelection || isTaskClosed || isBusy}
               className={styles.rewardInput}
               type="number"
               value={editedTask.reward}
@@ -185,7 +181,7 @@ export default function TaskModal({
             <select
               className={styles.statusSelect}
               value={editedTask.guildId.toString()}
-              disabled={!guildSelection || isTaskClosed}
+              disabled={!guildSelection || isTaskClosed || isBusy}
               onChange={(e) =>
                 setEditedTask({
                   ...editedTask,
@@ -211,7 +207,7 @@ export default function TaskModal({
           <select
             className={styles.statusSelect}
             value={Number(editedTask.taskStatus)}
-            disabled={!guildSelection && isTaskClosed}
+            disabled={(!guildSelection && isTaskClosed) || isBusy}
             onChange={(e) =>
               setEditedTask({
                 ...editedTask,
@@ -245,6 +241,9 @@ export default function TaskModal({
                 className={styles.rewardInput}
                 type="text"
                 value={editedTask.assignee}
+                disabled={
+                  isBusy || isTaskClosed || !hasChanges || !!assigneeError
+                }
                 onChange={(e) => {
                   const value = e.target.value;
                   setEditedTask({ ...editedTask, assignee: value });
@@ -277,14 +276,14 @@ export default function TaskModal({
               className={styles.button}
               onClick={handleUpdate}
               disabled={
-                isPending || isTaskClosed || !hasChanges || !!assigneeError
+                isBusy || isTaskClosed || !hasChanges || !!assigneeError
               }
             >
-              {isPending
-                ? isTaskStatusPending
-                  ? "⬆ Assigning..."
-                  : "⬆ Updating..."
-                : "⬆ Update"}
+              {isTaskUpdatePending || isUpdateTaskStatusConfirming
+                ? "⬆ Confirm in MetaMask..."
+                : isTaskUpdateConfirming || isUpdateTaskStatusConfirming
+                  ? "⬆ Confirming on Sepolia..."
+                  : "⬆ Update"}
             </button>
           </div>
         </div>

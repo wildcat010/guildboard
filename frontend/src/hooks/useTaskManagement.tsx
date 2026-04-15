@@ -21,18 +21,31 @@ export function useTaskManagement() {
   const {
     writeContract: writeUpdateTask,
     isPending: isTaskUpdatePending,
-    isSuccess: isTaskUpdateSuccess,
-    isError: isTaskUpdateError,
-    error: taskUpdateError,
-    reset: resetUpdateTask,
+    data: taskUpdateHash,
   } = useWriteContract();
 
   const {
+    isLoading: isTaskUpdateConfirming,
+    isSuccess: isTaskUpdateConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: taskUpdateHash,
+    confirmations: 1,
+  });
+
+  const {
     writeContract: writeUpdateTaskStatus,
-    isPending: isTaskStatusPending,
-    isSuccess: isTaskStatusSuccess,
-    isError: isTaskStatusError,
+    isPending: isUpdateTaskStatusPending,
+    isSuccess: isUpdateTaskStatusSuccess,
+    data: UpdateTaskStatusHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isUpdateTaskStatusConfirming,
+    isSuccess: isUpdateTaskStatusConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: UpdateTaskStatusHash,
+    confirmations: 1,
+  });
 
   const {
     writeContract: writeCloseAndPay,
@@ -56,13 +69,14 @@ export function useTaskManagement() {
     description: string,
     reward: bigint,
     guildId: bigint,
+    newStatus: number,
     assignee: string,
   ) {
     writeUpdateTask({
       address: GUILDBOARD_ADDRESS,
       abi: GUILDBOARD_ABI,
       functionName: "updateTaskAndAssign",
-      args: [taskId, name, description, reward, guildId, assignee],
+      args: [taskId, name, description, reward, guildId, newStatus, assignee],
     });
   }
 
@@ -88,12 +102,6 @@ export function useTaskManagement() {
     });
   }
 
-  useEffect(() => {
-    if (isTaskUpdateError && taskUpdateError) {
-      console.error("Update Task Error:", taskUpdateError);
-    }
-  }, [isTaskUpdateError, taskUpdateError]);
-
   return {
     createTask,
     isTaskCreatePending,
@@ -102,13 +110,12 @@ export function useTaskManagement() {
     isTaskCreateConfirmed,
     updateTask,
     isTaskUpdatePending,
-    isTaskUpdateSuccess,
-    isTaskUpdateError,
-    resetUpdateTask,
+    isTaskUpdateConfirming,
+    isTaskUpdateConfirmed,
     updateTaskStatus,
-    isTaskStatusPending,
-    isTaskStatusSuccess,
-    isTaskStatusError,
+    isUpdateTaskStatusPending,
+    isUpdateTaskStatusConfirming,
+    isUpdateTaskStatusConfirmed,
     closeAndPayTask,
     isCloseAndPayPending,
     isCloseAndPaySuccess,

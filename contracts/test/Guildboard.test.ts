@@ -152,6 +152,7 @@ describe("Task management", function () {
       "test task",
       parseEther("0.1"),
       1,
+      0,
       otherAccount.address,
     );
 
@@ -173,6 +174,7 @@ describe("Task management", function () {
         "test task",
         parseEther("0.1"),
         1,
+        0,
         otherAccount.address,
       ),
     ).to.be.revertedWith("GuildNFT: guild does not exist");
@@ -220,6 +222,7 @@ describe("Task management", function () {
       "test task",
       parseEther("0.1"),
       1,
+      3,
       otherAccount.address,
     );
 
@@ -242,6 +245,7 @@ describe("Task management", function () {
       "test task",
       parseEther("0.1"),
       1,
+      0,
       otherAccount.address,
     );
     await guildboard.updateTaskStatus(1, 3, otherAccount.address);
@@ -261,6 +265,7 @@ describe("Task management", function () {
       "test task",
       parseEther("0.1"),
       1,
+      0,
       otherAccount.address,
     );
     await guildboard.updateTaskAndAssign(
@@ -269,6 +274,7 @@ describe("Task management", function () {
       "test task",
       parseEther("0.1"),
       1,
+      0,
       otherAccount.address,
     );
 
@@ -290,6 +296,7 @@ describe("Task management", function () {
       "test task",
       parseEther("0.1"),
       1,
+      0,
       otherAccount.address,
     );
 
