@@ -31,9 +31,11 @@ export default function Settings() {
     enableShutdown,
     disableShutdown,
     isEnableShutdownPending,
-    isEnableShutdownSuccess,
+    isEnableShutdownConfirming,
+    isEnableShutdownConfirmed,
     isDisableShutdownPending,
-    isDisableShutdownSuccess,
+    isDisableShutdownConfirming,
+    isDisableShutdownConfirmed,
   } = useShutdownActions();
 
   const myGuilds = (guilds as Guild[]) ?? [];
@@ -57,10 +59,10 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    if (isEnableShutdownSuccess || isDisableShutdownSuccess) {
+    if (isEnableShutdownConfirmed || isDisableShutdownConfirmed) {
       refetchIsPaused();
     }
-  }, [isEnableShutdownSuccess, isDisableShutdownSuccess]);
+  }, [isEnableShutdownConfirmed, isDisableShutdownConfirmed]);
 
   return (
     <>
@@ -113,10 +115,17 @@ export default function Settings() {
         <button
           className={styles.btnPrimary}
           onClick={() => handlePauseContractProperty(isPaused as boolean)}
-          disabled={isEnableShutdownPending || isDisableShutdownPending}
+          disabled={
+            isEnableShutdownPending ||
+            isDisableShutdownPending ||
+            isEnableShutdownConfirming ||
+            isDisableShutdownConfirming
+          }
         >
           {isEnableShutdownPending || isDisableShutdownPending
-            ? "Processing..."
+            ? "⬆ Confirm in MetaMask..."
+            : isEnableShutdownConfirming || isDisableShutdownConfirming
+              ? "⬆ Confirming on Sepolia..."
             : !isPaused
               ? "Deactivate the Contract"
               : "Activate the Contract"}
@@ -138,7 +147,7 @@ export default function Settings() {
             setWithdrawalModal(false);
           }}
           balance={balance}
-          owner={address}
+          owner={address ?? ""}
           refetchBalance={refetchBalance}
         />
       )}

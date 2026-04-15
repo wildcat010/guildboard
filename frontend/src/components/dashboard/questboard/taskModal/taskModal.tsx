@@ -279,7 +279,7 @@ export default function TaskModal({
                 isBusy || isTaskClosed || !hasChanges || !!assigneeError
               }
             >
-              {isTaskUpdatePending || isUpdateTaskStatusConfirming
+              {isTaskUpdatePending || isUpdateTaskStatusPending
                 ? "⬆ Confirm in MetaMask..."
                 : isTaskUpdateConfirming || isUpdateTaskStatusConfirming
                   ? "⬆ Confirming on Sepolia..."

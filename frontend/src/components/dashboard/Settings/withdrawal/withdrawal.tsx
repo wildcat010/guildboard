@@ -20,7 +20,12 @@ export function Withdrawal({
   refetchBalance,
   owner,
 }: WithdrawalProps) {
-  const { withdrawTo, isWithdrawalPending, isWithdrawalSuccess } = usePayment();
+  const {
+    withdrawTo,
+    isWithdrawalPending,
+    isWithdrawalConfirming,
+    isWithdrawalConfirmed,
+  } = usePayment();
 
   const [addressTo, setAddressTo] = useState(owner);
   const [amount, setAmount] = useState(balance?.formatted);
@@ -40,11 +45,11 @@ export function Withdrawal({
   };
 
   useEffect(() => {
-    if (isWithdrawalSuccess) {
+    if (isWithdrawalConfirmed) {
       refetchBalance();
       onClose();
     }
-  }, [isWithdrawalSuccess]);
+  }, [isWithdrawalConfirmed]);
 
   return (
     <>
@@ -68,6 +73,7 @@ export function Withdrawal({
               type="text"
               value={addressTo}
               placeholder={addressTo}
+              disabled={isWithdrawalPending || isWithdrawalConfirming}
               onChange={(e) => setAddressTo(e.target.value)}
             />
           </div>
@@ -78,6 +84,7 @@ export function Withdrawal({
               type="number"
               value={amount}
               placeholder={amount}
+              disabled={isWithdrawalPending || isWithdrawalConfirming}
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
@@ -89,9 +96,13 @@ export function Withdrawal({
             <button
               className={styles.button}
               onClick={onWithdrawal}
-              disabled={isWithdrawalPending}
+              disabled={isWithdrawalPending || isWithdrawalConfirming}
             >
-              {isWithdrawalPending ? "Processing..." : "⬆ Withdrawal"}
+              {isWithdrawalPending
+                ? "⬆ Confirm in MetaMask..."
+                : isWithdrawalConfirming
+                  ? "⬆ Confirming on Sepolia..."
+                  : "⬆ Withdrawal"}
             </button>
           </div>
         </div>

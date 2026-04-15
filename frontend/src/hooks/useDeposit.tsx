@@ -1,15 +1,23 @@
 "use client";
-import { useReadContract, useWriteContract } from "wagmi";
+import {
+  useReadContract,
+  useWaitForTransactionReceipt,
+  useWriteContract,
+} from "wagmi";
 import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
 import { parseEther } from "viem";
 
 export function useDeposit() {
   const {
     writeContract: writeDeposit,
+    data: depositHash,
     isPending: isDepositPending,
-    isSuccess: isDepositSuccess,
-    isError: isDepositError,
   } = useWriteContract();
+
+  const { isLoading: isDepositConfirming, isSuccess: isDepositConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: depositHash,
+    });
 
   function deposit(name: string, date: string, amountInEth: string) {
     writeDeposit({
@@ -31,8 +39,8 @@ export function useDeposit() {
   return {
     deposit,
     isDepositPending,
-    isDepositSuccess,
-    isDepositError,
+    isDepositConfirming,
+    isDepositConfirmed,
     deposits,
     refetchDeposits,
   };

@@ -1,5 +1,5 @@
 import { GUILDBOARD_ABI, GUILDBOARD_ADDRESS } from "@/contracts";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 
 export function useShutdownActions() {
   const { writeContract } = useWriteContract();
@@ -7,16 +7,28 @@ export function useShutdownActions() {
   const {
     writeContract: writeEnableShutdown,
     isPending: isEnableShutdownPending,
-    isSuccess: isEnableShutdownSuccess,
-    isError: isEnableShutdownError,
+    data: enableShutdownHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isEnableShutdownConfirming,
+    isSuccess: isEnableShutdownConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: enableShutdownHash,
+  });
 
   const {
     writeContract: writeDisableShutdown,
     isPending: isDisableShutdownPending,
-    isSuccess: isDisableShutdownSuccess,
-    isError: isDisableShutdownError,
+    data: disableShutdownHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isDisableShutdownConfirming,
+    isSuccess: isDisableShutdownConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: disableShutdownHash,
+  });
 
   const enableShutdown = () =>
     writeEnableShutdown({
@@ -35,11 +47,11 @@ export function useShutdownActions() {
   return {
     enableShutdown,
     isEnableShutdownPending,
-    isEnableShutdownSuccess,
-    isEnableShutdownError,
+    isEnableShutdownConfirming,
+    isEnableShutdownConfirmed,
     disableShutdown,
     isDisableShutdownPending,
-    isDisableShutdownSuccess,
-    isDisableShutdownError,
+    isDisableShutdownConfirming,
+    isDisableShutdownConfirmed,
   };
 }

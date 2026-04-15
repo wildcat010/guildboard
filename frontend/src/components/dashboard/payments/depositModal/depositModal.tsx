@@ -1,7 +1,6 @@
 import { useDeposit } from "@/hooks/useDeposit";
 import styles from "./../depositModal/depositModal.module.css";
 import { useState, useEffect } from "react";
-import { useBalance } from "wagmi";
 
 type MembeDepositModalProps = {
   onClose: () => void;
@@ -27,18 +26,23 @@ export function DepositModal({
   const [depositAmount, setDepositAmount] = useState(0);
   const [name, setName] = useState("");
   const [date, setDate] = useState(getTodayDate());
-  const { deposit, isDepositPending, isDepositSuccess } = useDeposit();
+  const {
+    deposit,
+    isDepositPending,
+    isDepositConfirming,
+    isDepositConfirmed,
+  } = useDeposit();
 
   useEffect(() => {
-    if (isDepositSuccess) {
+    if (isDepositConfirmed) {
       refetchBalance();
       onDepositSuccess(); // ✅ refetch table
       onClose();
     }
-  }, [isDepositSuccess]);
+  }, [isDepositConfirmed]);
 
   const handleSubmit = () => {
-    if (isDepositSuccess) {
+    if (isDepositConfirmed) {
       onClose();
       refetchBalance();
       return;
@@ -82,8 +86,15 @@ export function DepositModal({
           </div>
           <div className={styles.modalFooter}>
             <button onClick={onClose}>Cancel</button>
-            <button onClick={handleSubmit} disabled={isDepositPending}>
-              {isDepositPending ? "Deposit..." : "Create Deposit"}
+            <button
+              onClick={handleSubmit}
+              disabled={isDepositPending || isDepositConfirming}
+            >
+              {isDepositPending
+                ? "⬆ Confirm in MetaMask..."
+                : isDepositConfirming
+                  ? "⬆ Confirming on Sepolia..."
+                  : "Create Deposit"}
             </button>
           </div>
         </div>

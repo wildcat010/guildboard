@@ -21,19 +21,23 @@ export function ListQuestToPay({
 }: ListQuestToPayProps) {
   const { getGuildById } = useGuildById(Number(task.guildId));
   const myGuild = getGuildById as Guild;
-  const { paidAndCloseQuest, isPaidTaskPending, isPaidTaskSuccess } =
-    usePayment();
+  const {
+    paidAndCloseQuest,
+    isPaidTaskPending,
+    isPaidTaskConfirmed,
+    isPaidTaskConfirming,
+  } = usePayment();
 
   function handlePay() {
     paidAndCloseQuest(BigInt(task.id));
   }
 
   useEffect(() => {
-    if (isPaidTaskSuccess) {
+    if (isPaidTaskConfirmed) {
       refetchAllTasks();
       refetchBalance();
     }
-  }, [isPaidTaskSuccess, refetchAllTasks, refetchBalance]);
+  }, [isPaidTaskConfirmed, refetchAllTasks, refetchBalance]);
 
   return (
     <>
@@ -55,7 +59,11 @@ export function ListQuestToPay({
           {task.assignee}
         </div>
         <button className={styles.memberUpdate} onClick={handlePay}>
-          {isPaidTaskPending ? "⬆ Paying..." : "⬆ Pay"}
+          {isPaidTaskPending
+            ? "⬆ Paying..."
+            : isPaidTaskConfirming
+              ? "⬆ Confirming on Sepolia..."
+              : "⬆ Pay"}
         </button>
       </div>
     </>

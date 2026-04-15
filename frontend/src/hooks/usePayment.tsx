@@ -1,14 +1,18 @@
 "use client";
-import { useWriteContract } from "wagmi";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { GUILDBOARD_ADDRESS, GUILDBOARD_ABI } from "@/contracts";
 
 export function usePayment() {
   const {
     writeContract: writePaidTask,
     isPending: isPaidTaskPending,
-    isSuccess: isPaidTaskSuccess,
-    isError: isPaidTaskError,
+    data: paidTaskHash,
   } = useWriteContract();
+
+  const { isLoading: isPaidTaskConfirming, isSuccess: isPaidTaskConfirmed } =
+    useWaitForTransactionReceipt({
+      hash: paidTaskHash,
+    });
 
   function paidAndCloseQuest(taskId: bigint) {
     writePaidTask({
@@ -22,9 +26,15 @@ export function usePayment() {
   const {
     writeContract: writeWithdrawal,
     isPending: isWithdrawalPending,
-    isSuccess: isWithdrawalSuccess,
-    isError: isWithdrawalError,
+    data: withdrawalHash,
   } = useWriteContract();
+
+  const {
+    isLoading: isWithdrawalConfirming,
+    isSuccess: isWithdrawalConfirmed,
+  } = useWaitForTransactionReceipt({
+    hash: withdrawalHash,
+  });
 
   function withdrawTo(to: string, amount: bigint) {
     writeWithdrawal({
@@ -37,12 +47,12 @@ export function usePayment() {
 
   return {
     isPaidTaskPending,
-    isPaidTaskSuccess,
-    isPaidTaskError,
+    isPaidTaskConfirming,
+    isPaidTaskConfirmed,
     paidAndCloseQuest,
     withdrawTo,
     isWithdrawalPending,
-    isWithdrawalSuccess,
-    isWithdrawalError,
+    isWithdrawalConfirming,
+    isWithdrawalConfirmed,
   };
 }
