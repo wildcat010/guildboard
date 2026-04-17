@@ -7,16 +7,17 @@ import { useQueryClient } from "@tanstack/react-query";
 export function useGuild(limit = 5, guildState = 0) {
   const { address, isConnected } = useAccount();
 
-  const { data: contractOwner } = useReadContract({
+  const { data: contractOwner, refetch: refetchOwner } = useReadContract({
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "owner",
-    query: { enabled: isConnected, retry: false },
+    query: { enabled: isConnected },
   });
 
   const isOwner =
-    isConnected &&
-    address?.toLowerCase() === (contractOwner as string)?.toLowerCase();
+    address &&
+    contractOwner &&
+    address.toLowerCase() === (contractOwner as string).toLowerCase();
 
   const { data: isMember } = useReadContract({
     address: GUILD_NFT_ADDRESS,
@@ -31,7 +32,7 @@ export function useGuild(limit = 5, guildState = 0) {
     abi: GUILD_NFT_ABI,
     functionName: "getAllGuilds",
     args: [guildState],
-    query: { enabled: isOwner, retry: false },
+    query: { retry: false },
   });
 
   const { data: activeGuildCount, refetch: refetchCounterActive } =
@@ -56,7 +57,7 @@ export function useGuild(limit = 5, guildState = 0) {
     address: GUILD_NFT_ADDRESS,
     abi: GUILD_NFT_ABI,
     functionName: "getGuildCount",
-    query: { enabled: isOwner, retry: false },
+    query: { retry: false },
   });
 
   const { data: guildCountLimit, refetch: refetchGuildsLimit } =
@@ -65,7 +66,7 @@ export function useGuild(limit = 5, guildState = 0) {
       abi: GUILD_NFT_ABI,
       functionName: "getRecentGuilds",
       args: [BigInt(limit)],
-      query: { enabled: isOwner, retry: false },
+      query: { retry: false },
     });
 
   return {
@@ -73,7 +74,6 @@ export function useGuild(limit = 5, guildState = 0) {
     guilds,
     guildCount,
     guildCountLimit,
-    isOwner,
     refetchGuilds,
     refetchGuildsCount,
     refetchGuildsLimit,
@@ -81,5 +81,8 @@ export function useGuild(limit = 5, guildState = 0) {
     inactiveGuildCount,
     refetchCounterActive,
     refetchCounterInactive,
+    isOwner,
+    contractOwner,
+    refetchOwner,
   };
 }

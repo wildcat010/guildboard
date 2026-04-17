@@ -36,6 +36,7 @@ export default function AddMemberModal() {
   };
 
   const onCreateGuild = () => {
+    console.log("isOwner", isOwner);
     if (isOwner) {
       setShowModalCreateGuild(true);
     } else {
