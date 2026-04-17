@@ -12,7 +12,7 @@ export default function AddMemberModal() {
 
   const {
     guilds,
-
+    isOwner,
     refetchGuilds,
     refetchGuildsCount,
     refetchGuildsLimit,
@@ -35,6 +35,14 @@ export default function AddMemberModal() {
     }, 500);
   };
 
+  const onCreateGuild = () => {
+    if (isOwner) {
+      setShowModalCreateGuild(true);
+    } else {
+      alert("Only the owner of the contract can create a guild.");
+    }
+  };
+
   return (
     <div className={styles.content}>
       <div className={`${styles.pageHeader} ${styles.animateIn}`}>
@@ -52,12 +60,7 @@ export default function AddMemberModal() {
             gap: "5px",
           }}
         >
-          <button
-            className={styles.btnPrimary}
-            onClick={() => {
-              setShowModalCreateGuild(true);
-            }}
-          >
+          <button className={styles.btnPrimary} onClick={onCreateGuild}>
             + Create Guild
           </button>
         </div>

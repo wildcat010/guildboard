@@ -9,6 +9,7 @@ import { DepositModal } from "./depositModal/depositModal";
 import { PaymentsTable } from "./paymentsTable/paymentsTable";
 import { useDeposit } from "@/hooks/useDeposit";
 import { PaymentModal } from "./paymentModal/paymentModal";
+import { useGuild } from "@/hooks/useGuild";
 
 export default function Payments() {
   const [depositModal, setDepositModal] = useState(false);
@@ -17,6 +18,15 @@ export default function Payments() {
     address: GUILDBOARD_ADDRESS,
   });
   const { refetchDeposits } = useDeposit();
+  const { isOwner } = useGuild();
+
+  const onPayement = () => {
+    if (isOwner) {
+      setPaymentModal(true);
+    } else {
+      alert("Only the owner of the contract can create a payment.");
+    }
+  };
 
   return (
     <div className={styles.content}>
@@ -25,10 +35,7 @@ export default function Payments() {
           <div className={styles.pageTitle}>Payments </div>
         </div>
         <div className={styles.buttonWraper}>
-          <button
-            className={styles.btnPrimary}
-            onClick={() => setPaymentModal(true)}
-          >
+          <button className={styles.btnPrimary} onClick={onPayement}>
             + Create Payment
           </button>
           <button

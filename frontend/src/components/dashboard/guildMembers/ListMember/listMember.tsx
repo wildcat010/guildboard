@@ -7,9 +7,10 @@ import MemberModal from "../../memberModal/memberModal";
 
 type ListMemberProps = {
   memberId: number;
+  isOwner: boolean;
 };
 
-export default function ListMember({ memberId }: ListMemberProps) {
+export default function ListMember({ memberId, isOwner }: ListMemberProps) {
   const { getMemberById, refetchMember } = useMember(memberId);
   const [memberModal, setMemberModal] = useState(false);
   const member = getMemberById as Member;
@@ -21,6 +22,7 @@ export default function ListMember({ memberId }: ListMemberProps) {
       {memberModal && (
         <MemberModal
           member={member}
+          isOwner={isOwner}
           refetchMember={refetchMember}
           refetchAllMember={() => {}}
           onClose={() => setMemberModal(false)}

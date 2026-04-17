@@ -15,6 +15,7 @@ type MemberModalProps = {
   refetchMember: () => void;
   onDeleteSuccess: () => void;
   refetchAllMember: () => void;
+  isOwner: boolean;
 };
 
 export default function MemberModal({
@@ -23,6 +24,7 @@ export default function MemberModal({
   refetchMember,
   onDeleteSuccess,
   refetchAllMember,
+  isOwner,
 }: MemberModalProps) {
   // ── State ──
   const [selectedRole, setSelectedRole] = useState(Number(member.role));
@@ -65,13 +67,23 @@ export default function MemberModal({
 
   // ── Actions ──
   function handleUpgrade() {
-    pendingUpgrade.current = true;
-    upgradeMember(Number(memberState.id), selectedRole);
+    if (isOwner) {
+      pendingUpgrade.current = true;
+      upgradeMember(Number(memberState.id), selectedRole);
+    } else {
+      alert(
+        "Only the owner of the contract can upgrade the role of the member.",
+      );
+    }
   }
 
   function handleDelete() {
-    pendingClose.current = true;
-    removeMember(Number(memberState.id));
+    if (isOwner) {
+      pendingClose.current = true;
+      removeMember(Number(memberState.id));
+    } else {
+      alert("Only the owner of the contract can delete the member.");
+    }
   }
 
   // ── Effects ──

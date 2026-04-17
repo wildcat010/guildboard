@@ -250,9 +250,9 @@ describe("Task management", function () {
     );
     await guildboard.updateTaskStatus(1, 3, otherAccount.address);
 
-    await expect(guildboard.connect(otherAccount).closeAndPayTask(1))
-      .to.be.revertedWithCustomError(guildboard, "OwnableUnauthorizedAccount")
-      .withArgs(otherAccount.address);
+    await expect(
+      guildboard.connect(otherAccount).closeAndPayTask(1),
+    ).to.be.revertedWithCustomError(guildboard, "NotOwner");
   });
 
   it("should return all the tasks for a guild", async () => {

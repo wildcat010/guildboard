@@ -6,6 +6,7 @@ import { useTask } from "@/hooks/useTask";
 import { useEffect, useState } from "react";
 import { usePayment } from "@/hooks/usePayment";
 import { isAddress, parseEther } from "ethers";
+import { useGuild } from "@/hooks/useGuild";
 
 type WithdrawalProps = {
   onClose: () => void;
@@ -27,21 +28,27 @@ export function Withdrawal({
     isWithdrawalConfirmed,
   } = usePayment();
 
+  const { isOwner } = useGuild();
+
   const [addressTo, setAddressTo] = useState(owner);
   const [amount, setAmount] = useState(balance?.formatted);
 
   const onWithdrawal = () => {
-    if (!isAddress(addressTo)) {
-      alert("Invalid wallet address");
-      return;
-    }
+    if (isOwner) {
+      if (!isAddress(addressTo)) {
+        alert("Invalid wallet address");
+        return;
+      }
 
-    if (!amount || Number(amount) <= 0) {
-      alert("Invalid amount");
-      return;
-    }
+      if (!amount || Number(amount) <= 0) {
+        alert("Invalid amount");
+        return;
+      }
 
-    withdrawTo(addressTo, parseEther(amount));
+      withdrawTo(addressTo, parseEther(amount));
+    } else {
+      alert("Only the owner of the contract can perform withdrawals.");
+    }
   };
 
   useEffect(() => {

@@ -53,12 +53,13 @@ export default function TaskModal({
     isUpdateTaskStatusConfirmed,
   } = useTaskManagement();
 
-  const { guilds } = useGuild();
+  const { guilds, isOwner } = useGuild();
   const guildsArray =
     (guilds as Guild[])?.filter((guild) => guild.active === true) ?? [];
 
   useEffect(() => {
     if (isUpdateTaskStatusConfirmed) {
+      console.log("Task status update confirmed, refetching tasks...");
       refetchAllTasks();
       onClose();
     }
@@ -66,6 +67,7 @@ export default function TaskModal({
 
   useEffect(() => {
     if (isTaskUpdateConfirmed) {
+      console.log("Task update confirmed, refetching tasks...");
       refetchAllTasks();
       onClose();
     }
@@ -73,15 +75,19 @@ export default function TaskModal({
 
   const handleUpdate = () => {
     if (guildSelection) {
-      updateTask(
-        task.id,
-        editedTask.name,
-        editedTask.description,
-        parseEther(editedTask.reward),
-        editedTask.guildId ?? 0,
-        editedTask.taskStatus,
-        editedTask.assignee as `0x${string}`,
-      );
+      if (isOwner) {
+        updateTask(
+          task.id,
+          editedTask.name,
+          editedTask.description,
+          parseEther(editedTask.reward),
+          editedTask.guildId ?? 0,
+          editedTask.taskStatus,
+          editedTask.assignee as `0x${string}`,
+        );
+      } else {
+        alert("Only the owner of the contract can update the task.");
+      }
     } else {
       updateTaskStatus(
         task.id,
@@ -115,7 +121,7 @@ export default function TaskModal({
               fontWeight: "bold",
             }}
           >
-            ⚠ This task is closed and cannot be modified
+            This task is closed and cannot be modified
           </div>
         )}
 

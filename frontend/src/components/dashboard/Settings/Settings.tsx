@@ -23,7 +23,7 @@ export default function Settings() {
 
   const [withdrawalModal, setWithdrawalModal] = useState(false);
 
-  const { guilds } = useGuild();
+  const { guilds, isOwner } = useGuild();
   const { getAllMembers } = useMember();
   const { getAllTasks } = useTask();
   const { isPaused, refetchIsPaused } = useSettings();
@@ -47,10 +47,14 @@ export default function Settings() {
     (getAllTasks as Task[])?.filter((task) => task.status === 4) ?? [];
 
   const handlePauseContractProperty = (isPaused: boolean) => {
-    if (isPaused) {
-      disableShutdown();
+    if (isOwner) {
+      if (isPaused) {
+        disableShutdown();
+      } else {
+        enableShutdown();
+      }
     } else {
-      enableShutdown();
+      alert("Only the owner of the contract can perform this action.");
     }
   };
 
@@ -108,7 +112,8 @@ export default function Settings() {
         <div className={`${styles.pageHeader} ${styles.animateIn}`}>
           <div>
             <div className={styles.pageTitle}>
-              Settings - Disable Contract - {isPaused ? "Paused" : "Active"}
+              Settings - Disable/Enable Contract -{" "}
+              {isPaused ? "Paused" : "Active"}
             </div>
           </div>
         </div>
@@ -126,9 +131,9 @@ export default function Settings() {
             ? "⬆ Confirm in MetaMask..."
             : isEnableShutdownConfirming || isDisableShutdownConfirming
               ? "⬆ Confirming on Sepolia..."
-            : !isPaused
-              ? "Deactivate the Contract"
-              : "Activate the Contract"}
+              : !isPaused
+                ? "Deactivate the Contract"
+                : "Activate the Contract"}
         </button>
         <div className={`${styles.pageHeader} ${styles.animateIn}`}>
           <div>

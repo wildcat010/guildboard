@@ -32,15 +32,25 @@ export default function MembersModal({
     isStatusGuildConfirming,
   } = useManagementGuild();
 
-  const { refetchCounterActive, refetchCounterInactive } = useGuild();
-  const { refetchGuilds } = useGuild();
+  const {
+    refetchCounterActive,
+    refetchCounterInactive,
+    refetchGuilds,
+    isOwner,
+  } = useGuild();
 
   const clickStatus = () => {
-    pendingStatus.current = !activeGuild;
-    if (activeGuild) {
-      disableStatus(Number(guildCard.id));
+    if (isOwner) {
+      pendingStatus.current = !activeGuild;
+      if (activeGuild) {
+        disableStatus(Number(guildCard.id));
+      } else {
+        enableStatus(Number(guildCard.id));
+      }
     } else {
-      enableStatus(Number(guildCard.id));
+      alert(
+        "Only the owner of the contract can change the status of the guild.",
+      );
     }
   };
 
@@ -66,7 +76,7 @@ export default function MembersModal({
           <span className={styles.formLabel}>Users - {listMembers.length}</span>
           <div>
             {listMembers.map((memberId: number, i: number) => (
-              <ListMember key={i} memberId={memberId} />
+              <ListMember key={i} memberId={memberId} isOwner={isOwner} />
             ))}
           </div>
         </div>

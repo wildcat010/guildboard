@@ -15,6 +15,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuardTransient.sol";
 // INTERFACE — talks to GuildNFT contract
 // =========================================
 interface IGuildNFT {
+    function owner() external view returns (address);
     function isMember(address wallet) external view returns (bool);
     function getRoleByWallet(address wallet) external view returns (uint8);
     function isMemberOfGuild(address wallet, uint256 guildId) external view returns (bool);
@@ -31,9 +32,9 @@ interface IGuildNFT {
 
 contract Guildboard is 
 Initializable
-,OwnableUpgradeable
 ,UUPSUpgradeable
-,PausableUpgradeable, ReentrancyGuardTransient {
+,PausableUpgradeable, 
+ReentrancyGuardTransient {
 
     enum TaskStatus { toDo, inProgress, Done, Verified, Close }
 
@@ -79,8 +80,14 @@ Initializable
     event TaskStatusUpdated(uint256 taskId, TaskStatus newStatus);
     event Deposited(uint256 depositId, uint256 amount);
 
+    // =========================================
+    // ERRORS
+    // =========================================
+    error NotOwner();
 
-     // =========================================
+
+
+    // =========================================
     // MODIFIERS
     // =========================================
     modifier taskExists(uint256 taskId) {
@@ -91,6 +98,13 @@ Initializable
     modifier guildActiveOnNFT(uint256 guildId) {
         IGuildNFT.Guild memory g = guildNFT.getGuild(guildId);
         require(g.active, "GuildBoard: guild is not active");
+        _;
+    }
+
+    modifier onlyOwner() {
+        if(msg.sender != guildNFT.owner()){
+            revert NotOwner();
+        }
         _;
     }
 
@@ -259,7 +273,6 @@ Initializable
     // CONSTRUCTOR & INITIALIZER
     // =========================================
     function initialize(address _guildNFT) public initializer {
-        __Ownable_init(msg.sender);
        __Pausable_init();
         guildNFT = IGuildNFT(_guildNFT);
     }
