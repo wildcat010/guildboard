@@ -198,7 +198,7 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
     // MEMBER FUNCTIONS
     // =========================================
     function mintMember(string memory name, address to, string memory uri, uint256 guildId)
-        external onlyOwner notAlreadyMember(to) guildExists(guildId) guildActivated(guildId)
+        external notAlreadyMember(to) guildExists(guildId) guildActivated(guildId)
     {
         _memberIdCounter++;
         _memberCounter++;
@@ -224,7 +224,7 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
     return _members[memberId];
 }
 
-    function removeGuildMember(uint256 memberId) external onlyOwner memberExists(memberId) {
+    function removeGuildMember(uint256 memberId) external memberExists(memberId) {
         uint256 guildId = _members[memberId].guildId;
         uint256[] storage memberIds = _guildMembers[guildId];
 
@@ -246,7 +246,7 @@ contract GuildNFT is Initializable, ERC721Upgradeable, OwnableUpgradeable, UUPSU
         emit MemberRemoved(memberId, guildId);
     }
 
-    function upgradeMember(uint256 memberId, Role newRole) external onlyOwner memberExists(memberId) {
+    function upgradeMember(uint256 memberId, Role newRole) external memberExists(memberId) {
         _members[memberId].role = newRole;
         emit MemberUpgraded(memberId, newRole);
     }

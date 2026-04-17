@@ -4,22 +4,29 @@ import styles from "./MyGuild.module.css";
 import { useEffect } from "react";
 
 import { useAccount } from "wagmi";
-import { Member, roleNames, Task, taskStatus } from "@/constants/constants";
+import {
+  Guild,
+  Member,
+  roleNames,
+  Task,
+  taskStatus,
+} from "@/constants/constants";
 import { useGuild } from "@/hooks/useGuild";
 import { useMember } from "@/hooks/useMember";
 import { useTask } from "@/hooks/useTask";
 import { formatEther, parseEther } from "ethers";
 import TaskCard from "../../questboard/taskCard/taskCard";
+import { useGuildById } from "@/hooks/useGuildById";
 
 export default function MyGuild() {
   const { address } = useAccount();
-  const { isOwner } = useGuild();
+
   const { getMemberByAddress } = useMember(0, address ?? "");
   const myMember = getMemberByAddress as Member | undefined;
 
   const guildId = myMember?.guildId ? Number(myMember.guildId) : 0;
   const { getTasksByGuildId, refetchTasksByGuildId } = useTask(0, guildId);
-
+  const { guildMembers } = useGuildById(guildId);
   const myGuildSelection = false;
 
   useEffect(() => {
@@ -59,6 +66,7 @@ export default function MyGuild() {
             My Guild -{" "}
             {`${myMember?.name} - ${roleNames[Number(myMember?.role)]}`}
           </div>
+
           <div className={styles.pageSub}>
             Rewards -{" "}
             {formatEther(
@@ -68,6 +76,10 @@ export default function MyGuild() {
               ),
             )}
             &nbsp;ETH
+          </div>
+
+          <div className={styles.pageSub}>
+            Members - {guildMembers ? guildMembers.length : 0}
           </div>
         </div>
       </div>

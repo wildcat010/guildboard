@@ -4,10 +4,15 @@ import styles from "./hero.module.css";
 
 import { useGuild } from "@/hooks/useGuild";
 import { useAccount } from "wagmi";
-import { roleNames } from "../../../constants/constants";
+import { Member, roleNames } from "../../../constants/constants";
+import { useMember } from "@/hooks/useMember";
 
 export default function Hero() {
   const { isConnected } = useAccount();
+  const { address } = useAccount();
+  const { getMemberByAddress } = useMember(0, address ?? "");
+  const myMember = getMemberByAddress as Member | undefined;
+
   const { isMember, role } = useGuild();
 
   if (!isConnected) return <p>Please connect your wallet</p>;
@@ -26,8 +31,8 @@ export default function Hero() {
           <div>
             {isMember ? (
               <p className={styles.heroDesc}>
-                ✅ You are a guild member — role:
-                {roleNames[role as number] ?? "Unknow"}
+                ✅ You are a guild member — role:&nbsp;
+                {roleNames[Number(myMember?.role)]}
               </p>
             ) : (
               <p className={styles.heroDesc}>❌ You are not a member</p>
