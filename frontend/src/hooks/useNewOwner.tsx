@@ -8,16 +8,8 @@ import {
 } from "@/contracts";
 
 export function useNewOwner() {
-  const {
-    writeContract: writeNewOwner,
-    isPending: isNewOwnerPending,
-    data: newOwnerHash,
-  } = useWriteContract();
-
-  const { isLoading: isNewOwnerConfirming, isSuccess: isNewOwnerConfirmed } =
-    useWaitForTransactionReceipt({
-      hash: newOwnerHash,
-    });
+  const { writeContract: writeNewOwner, isPending: isNewOwnerPending } =
+    useWriteContract();
 
   function setNewOwner(newOwner: string) {
     writeNewOwner({
@@ -31,7 +23,5 @@ export function useNewOwner() {
   return {
     setNewOwner,
     isNewOwnerPending,
-    isNewOwnerConfirming,
-    isNewOwnerConfirmed,
   };
 }

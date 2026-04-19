@@ -7,31 +7,30 @@ import { useNewOwner } from "@/hooks/useNewOwner";
 type TransferOwnershipProps = {
   onClose: () => void;
   refetchOwner: () => void;
+  setIsRefreshing: (value: boolean) => void;
+  isRefreshing: boolean;
+  isOwner: boolean;
 };
 
 export function TransferOwnership({
   onClose,
   refetchOwner,
+  isRefreshing,
+  setIsRefreshing,
+  isOwner,
 }: TransferOwnershipProps) {
-  const {
-    setNewOwner,
-    isNewOwnerPending,
-    isNewOwnerConfirming,
-    isNewOwnerConfirmed,
-  } = useNewOwner();
+  const { setNewOwner, isNewOwnerPending } = useNewOwner();
 
   const [addressTo, setAddressTo] = useState("");
 
   const onTransfer = () => {
-    setNewOwner(addressTo);
-  };
-
-  useEffect(() => {
-    if (isNewOwnerConfirmed) {
-      refetchOwner();
-      onClose();
+    if (isOwner) {
+      setIsRefreshing(true);
+      setNewOwner(addressTo);
+    } else {
+      alert("Only the owner of the smart contract can do it.");
     }
-  }, [isNewOwnerConfirmed]);
+  };
 
   return (
     <>
@@ -48,7 +47,7 @@ export function TransferOwnership({
               type="text"
               value={addressTo}
               placeholder={addressTo}
-              disabled={isNewOwnerPending || isNewOwnerConfirming}
+              disabled={isNewOwnerPending}
               onChange={(e) => setAddressTo(e.target.value)}
             />
           </div>
@@ -60,13 +59,13 @@ export function TransferOwnership({
             <button
               className={styles.button}
               onClick={onTransfer}
-              disabled={isNewOwnerPending || isNewOwnerConfirming}
+              disabled={isNewOwnerPending}
             >
               {isNewOwnerPending
                 ? "⬆ Confirm in MetaMask..."
-                : isNewOwnerConfirming
-                  ? "⬆ Confirming on Sepolia..."
-                  : "⬆ Update"}
+                : isRefreshing
+                  ? "⬆ Updating..."
+                  : "Update"}
             </button>
           </div>
         </div>
