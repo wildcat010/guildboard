@@ -7,25 +7,21 @@ import { useNewOwner } from "@/hooks/useNewOwner";
 type TransferOwnershipProps = {
   onClose: () => void;
   refetchOwner: () => void;
-  setIsRefreshing: (value: boolean) => void;
-  isRefreshing: boolean;
   isOwner: boolean;
 };
 
 export function TransferOwnership({
   onClose,
   refetchOwner,
-  isRefreshing,
-  setIsRefreshing,
   isOwner,
 }: TransferOwnershipProps) {
-  const { setNewOwner, isNewOwnerPending } = useNewOwner();
+  const { setNewOwner, isNewOwnerPending, isNewOwnerConfirming } =
+    useNewOwner();
 
   const [addressTo, setAddressTo] = useState("");
 
   const onTransfer = () => {
     if (isOwner) {
-      setIsRefreshing(true);
       setNewOwner(addressTo);
     } else {
       alert("Only the owner of the smart contract can do it.");
@@ -63,9 +59,9 @@ export function TransferOwnership({
             >
               {isNewOwnerPending
                 ? "⬆ Confirm in MetaMask..."
-                : isRefreshing
-                  ? "⬆ Updating..."
-                  : "Update"}
+                : isNewOwnerConfirming
+                  ? "⬆ Confirming on Sepolia..."
+                  : "⬆ Update"}
             </button>
           </div>
         </div>

@@ -6,13 +6,8 @@ import { useEffect, useState } from "react";
 import { useGuild } from "@/hooks/useGuild";
 
 import { Guild, Member, Task } from "../../../constants/constants";
-import {
-  GUILD_NFT_ABI,
-  GUILD_NFT_ADDRESS,
-  GUILDBOARD_ABI,
-  GUILDBOARD_ADDRESS,
-} from "@/contracts";
-import { useAccount, useBalance, useWatchContractEvent } from "wagmi";
+import { GUILDBOARD_ADDRESS } from "@/contracts";
+import { useAccount, useBalance } from "wagmi";
 import { useMember } from "@/hooks/useMember";
 import { useTask } from "@/hooks/useTask";
 import { useSettings } from "@/hooks/useSettings";
@@ -40,7 +35,11 @@ export default function Settings() {
     enableShutdown,
     disableShutdown,
     isEnableShutdownPending,
+    isEnableShutdownConfirming,
+    isEnableShutdownConfirmed,
     isDisableShutdownPending,
+    isDisableShutdownConfirming,
+    isDisableShutdownConfirmed,
   } = useShutdownActions();
 
   const myGuilds = (guilds as Guild[]) ?? [];
@@ -53,7 +52,6 @@ export default function Settings() {
 
   const handlePauseContractProperty = (isPaused: boolean) => {
     if (isOwner) {
-      setIsRefreshing(true);
       if (isPaused) {
         disableShutdown();
       } else {
@@ -65,6 +63,7 @@ export default function Settings() {
   };
 
   const onTransferOwnership = () => {
+    console.log(1);
     if (isOwner) {
       setTransferOwnershipModal(true);
     } else {
@@ -76,41 +75,11 @@ export default function Settings() {
     setWithdrawalModal(true);
   };
 
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useWatchContractEvent({
-    address: GUILD_NFT_ADDRESS,
-    abi: GUILD_NFT_ABI,
-    eventName: "OwnershipTransferred",
-    onLogs: (log) => {
-      console.log("OwnershipTransferred fired:", log);
-      refetchOwner();
-      setTransferOwnershipModal(false);
-      setIsRefreshing(false);
-    },
-  });
-
-  useWatchContractEvent({
-    address: GUILDBOARD_ADDRESS,
-    abi: GUILDBOARD_ABI,
-    eventName: "Paused",
-    onLogs: () => {
+  useEffect(() => {
+    if (isEnableShutdownConfirmed || isDisableShutdownConfirmed) {
       refetchIsPaused();
-      refetchBalance();
-      setIsRefreshing(false);
-    },
-  });
-
-  useWatchContractEvent({
-    address: GUILDBOARD_ADDRESS,
-    abi: GUILDBOARD_ABI,
-    eventName: "Unpaused",
-    onLogs: () => {
-      refetchIsPaused();
-      refetchBalance();
-      setIsRefreshing(false);
-    },
-  });
+    }
+  }, [isEnableShutdownConfirmed, isDisableShutdownConfirmed]);
 
   return (
     <>
@@ -165,13 +134,16 @@ export default function Settings() {
           className={styles.btnPrimary}
           onClick={() => handlePauseContractProperty(isPaused as boolean)}
           disabled={
-            isEnableShutdownPending || isDisableShutdownPending || isRefreshing
+            isEnableShutdownPending ||
+            isDisableShutdownPending ||
+            isEnableShutdownConfirming ||
+            isDisableShutdownConfirming
           }
         >
           {isEnableShutdownPending || isDisableShutdownPending
             ? "⬆ Confirm in MetaMask..."
-            : isRefreshing
-              ? "⏳ Updating..."
+            : isEnableShutdownConfirming || isDisableShutdownConfirming
+              ? "⬆ Confirming on Sepolia..."
               : !isPaused
                 ? "Deactivate the Contract"
                 : "Activate the Contract"}
@@ -193,12 +165,8 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        <button
-          className={styles.btnPrimary}
-          onClick={onTransferOwnership}
-          disabled={isRefreshing}
-        >
-          {isRefreshing ? "⏳ Updating..." : "Transfer Ownership"}
+        <button className={styles.btnPrimary} onClick={onTransferOwnership}>
+          Transfer Ownership
         </button>
       </div>
       {withdrawalModal && (
@@ -214,12 +182,9 @@ export default function Settings() {
       {transferOwnershipModal && (
         <TransferOwnership
           onClose={() => {
-            setIsRefreshing(false);
             setTransferOwnershipModal(false);
           }}
           refetchOwner={refetchOwner}
-          isRefreshing={isRefreshing}
-          setIsRefreshing={setIsRefreshing}
           isOwner={isOwner as boolean}
         />
       )}
