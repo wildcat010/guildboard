@@ -17,18 +17,14 @@ export default function Dashboard() {
     <>
       <div id="dashboard" style={{ display: "block" }}>
         <div className={styles.main}>
-          {isConnected ? (
-            <>
-              <Sidebar
-                activeSection={activeSection}
-                onSectionChange={setActiveSection}
-              ></Sidebar>
-              <Content activeSection={activeSection}></Content>
-              <Rightbar></Rightbar>
-            </>
-          ) : (
-            <p>❌ You are not the owner</p>
-          )}
+          <>
+            <Sidebar
+              activeSection={activeSection}
+              onSectionChange={setActiveSection}
+            ></Sidebar>
+            <Content activeSection={activeSection}></Content>
+            <Rightbar></Rightbar>
+          </>
         </div>
       </div>
     </>
