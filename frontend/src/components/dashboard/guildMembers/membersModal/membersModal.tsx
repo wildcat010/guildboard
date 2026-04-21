@@ -76,7 +76,11 @@ export default function MembersModal({
           <span className={styles.formLabel}>Users - {listMembers.length}</span>
           <div>
             {listMembers.map((memberId: number, i: number) => (
-              <ListMember key={i} memberId={memberId} isOwner={isOwner} />
+              <ListMember
+                key={i}
+                memberId={memberId}
+                isOwner={isOwner as boolean}
+              />
             ))}
           </div>
         </div>

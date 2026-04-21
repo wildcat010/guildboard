@@ -13,7 +13,7 @@ export default function Hero() {
   const { getMemberByAddress } = useMember(0, address ?? "");
   const myMember = getMemberByAddress as Member | undefined;
 
-  const { isMember, role } = useGuild();
+  const { isMember } = useGuild();
 
   if (!isConnected) return <p>Please connect your wallet</p>;
 

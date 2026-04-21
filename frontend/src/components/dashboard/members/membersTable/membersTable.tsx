@@ -65,6 +65,7 @@ export default function MembersTable() {
           refetchAllMember={refetchAllMember}
           onClose={() => setSelectedMember(null)}
           onDeleteSuccess={() => handleDeleteSuccess(Number(selectedMember.id))}
+          isOwner={false}
         />
       )}
       <SimpleTable
