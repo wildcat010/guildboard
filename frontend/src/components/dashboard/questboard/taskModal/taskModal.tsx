@@ -237,7 +237,7 @@ export default function TaskModal({
           <span className={styles.formLabel}>
             Assignee{" "}
             <span className={styles.note}>
-              (can be updated only with "verified" status)
+              (can be updated only with verified status)
             </span>
           </span>
 

@@ -7,31 +7,26 @@ import { useNewOwner } from "@/hooks/useNewOwner";
 type TransferOwnershipProps = {
   onClose: () => void;
   refetchOwner: () => void;
+  isOwner: boolean;
 };
 
 export function TransferOwnership({
   onClose,
   refetchOwner,
+  isOwner,
 }: TransferOwnershipProps) {
-  const {
-    setNewOwner,
-    isNewOwnerPending,
-    isNewOwnerConfirming,
-    isNewOwnerConfirmed,
-  } = useNewOwner();
+  const { setNewOwner, isNewOwnerPending, isNewOwnerConfirming } =
+    useNewOwner();
 
   const [addressTo, setAddressTo] = useState("");
 
   const onTransfer = () => {
-    setNewOwner(addressTo);
-  };
-
-  useEffect(() => {
-    if (isNewOwnerConfirmed) {
-      refetchOwner();
-      onClose();
+    if (isOwner) {
+      setNewOwner(addressTo);
+    } else {
+      alert("Only the owner of the smart contract can do it.");
     }
-  }, [isNewOwnerConfirmed]);
+  };
 
   return (
     <>
@@ -48,7 +43,7 @@ export function TransferOwnership({
               type="text"
               value={addressTo}
               placeholder={addressTo}
-              disabled={isNewOwnerPending || isNewOwnerConfirming}
+              disabled={isNewOwnerPending}
               onChange={(e) => setAddressTo(e.target.value)}
             />
           </div>
@@ -60,7 +55,7 @@ export function TransferOwnership({
             <button
               className={styles.button}
               onClick={onTransfer}
-              disabled={isNewOwnerPending || isNewOwnerConfirming}
+              disabled={isNewOwnerPending}
             >
               {isNewOwnerPending
                 ? "⬆ Confirm in MetaMask..."

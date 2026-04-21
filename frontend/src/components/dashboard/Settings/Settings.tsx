@@ -185,6 +185,7 @@ export default function Settings() {
             setTransferOwnershipModal(false);
           }}
           refetchOwner={refetchOwner}
+          isOwner={isOwner as boolean}
         />
       )}
     </>
