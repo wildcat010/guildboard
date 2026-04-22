@@ -7,25 +7,26 @@ import { useGuild } from "@/hooks/useGuild";
 
 import { Guild, Member, Task } from "../../../constants/constants";
 import { GUILDBOARD_ADDRESS } from "@/contracts";
-import { useAccount, useBalance, usePublicClient } from "wagmi";
+
+import { usePublicClient } from "wagmi";
+
 import { useMember } from "@/hooks/useMember";
 import { useTask } from "@/hooks/useTask";
 import { useSettings } from "@/hooks/useSettings";
 import { useShutdownActions } from "@/hooks/useShutdownActions";
+
 import { Withdrawal } from "./withdrawal/withdrawal";
 import { TransferOwnership } from "./transferOwnership/transferOwnership";
 
 export default function Settings() {
   // =========================
-  // FIX #1: contract balance was incorrectly using useBalance with a CONTRACT address
-  // This is unreliable for contracts in wagmi + often breaks in production
+  // ORIGINAL BALANCE LOGIC (manual fetch restored)
   // =========================
   const publicClient = usePublicClient();
 
   const [contractBalance, setContractBalance] = useState<bigint | null>(null);
 
   useEffect(() => {
-    // FIX #2: wait until wallet + client exist before querying blockchain
     if (!publicClient) return;
 
     const fetchBalance = async () => {
@@ -33,6 +34,7 @@ export default function Settings() {
         const bal = await publicClient.getBalance({
           address: GUILDBOARD_ADDRESS as `0x${string}`,
         });
+
         setContractBalance(bal);
       } catch (err) {
         console.error("Failed to fetch contract balance:", err);
@@ -42,8 +44,10 @@ export default function Settings() {
     fetchBalance();
   }, [publicClient]);
 
+  // =========================
+  // ORIGINAL HOOKS (cleaned duplicates)
+  // =========================
   const { contractOwner, refetchOwner, guilds, isOwner } = useGuild();
-  const owner = contractOwner as string;
 
   const [withdrawalModal, setWithdrawalModal] = useState(false);
   const [transferOwnershipModal, setTransferOwnershipModal] = useState(false);
@@ -57,18 +61,11 @@ export default function Settings() {
     disableShutdown,
     isEnableShutdownPending,
     isEnableShutdownConfirming,
-    isEnableShutdownConfirmed,
     isDisableShutdownPending,
     isDisableShutdownConfirming,
-    isDisableShutdownConfirmed,
   } = useShutdownActions();
 
   const myGuilds = (guilds as Guild[]) ?? [];
-
-  // =========================
-  // FIX #3: these were likely async hooks OR undefined on first render
-  // now we safely guard against undefined + timing issues
-  // =========================
   const members = (getAllMembers as Member[]) ?? [];
   const tasks = (getAllTasks as Task[]) ?? [];
 
@@ -79,14 +76,15 @@ export default function Settings() {
     (getAllTasks as Task[])?.filter((task) => task.status === 4) ?? [];
 
   const handlePauseContractProperty = (isPaused: boolean) => {
-    if (isOwner) {
-      if (isPaused) {
-        disableShutdown();
-      } else {
-        enableShutdown();
-      }
-    } else {
+    if (!isOwner) {
       alert("Only the owner of the contract can perform this action.");
+      return;
+    }
+
+    if (isPaused) {
+      disableShutdown();
+    } else {
+      enableShutdown();
     }
   };
 
@@ -103,38 +101,25 @@ export default function Settings() {
   };
 
   useEffect(() => {
-    if (isEnableShutdownConfirmed || isDisableShutdownConfirmed) {
-      refetchIsPaused();
-    }
-  }, [isEnableShutdownConfirmed, isDisableShutdownConfirmed]);
-
-  // =========================
-  // FIX #4: logging env vars is fine — but NOT the root issue anymore
-  // they ARE correctly loaded (confirmed earlier)
-  // =========================
-  console.log("NFT:", process.env.NEXT_PUBLIC_GUILD_NFT_ADDRESS);
-  console.log("Board:", process.env.NEXT_PUBLIC_GUILDBOARD_ADDRESS);
-  console.log("RPC:", process.env.NEXT_PUBLIC_RPC_URL);
+    refetchIsPaused();
+  }, []);
 
   return (
     <>
       <div className={styles.content}>
         <div className={`${styles.pageHeader} ${styles.animateIn}`}>
-          <div>
-            <div className={styles.pageTitle}>Settings - Quick Dashboard</div>
-          </div>
+          <div className={styles.pageTitle}>Settings - Quick Dashboard</div>
         </div>
 
         <div className={styles.pageSub}>
           Owner
-          <p className={styles.text}>{owner}</p>
+          <p className={styles.text}>{contractOwner as string}</p>
         </div>
 
         <div className={styles.container}>
           <div className={styles.pageSub}>
             Contract Balance
             <p className={styles.text}>
-              {/* FIX #5: replaced wagmi useBalance with safe manual fetch */}
               {contractBalance
                 ? `${Number(contractBalance) / 1e18} ETH`
                 : "Loading..."}
@@ -168,11 +153,9 @@ export default function Settings() {
         </div>
 
         <div className={`${styles.pageHeader} ${styles.animateIn}`}>
-          <div>
-            <div className={styles.pageTitle}>
-              Settings - Disable/Enable Contract -{" "}
-              {isPaused ? "Paused" : "Active"}
-            </div>
+          <div className={styles.pageTitle}>
+            Settings - Disable/Enable Contract -{" "}
+            {isPaused ? "Paused" : "Active"}
           </div>
         </div>
 
@@ -196,10 +179,8 @@ export default function Settings() {
         </button>
 
         <div className={`${styles.pageHeader} ${styles.animateIn}`}>
-          <div>
-            <div className={styles.pageTitle}>
-              Settings - Emergency Withdrawal
-            </div>
+          <div className={styles.pageTitle}>
+            Settings - Emergency Withdrawal
           </div>
         </div>
 
@@ -208,11 +189,7 @@ export default function Settings() {
         </button>
 
         <div className={`${styles.pageHeader} ${styles.animateIn}`}>
-          <div>
-            <div className={styles.pageTitle}>
-              Settings - Transfer Ownership
-            </div>
-          </div>
+          <div className={styles.pageTitle}>Settings - Transfer Ownership</div>
         </div>
 
         <button className={styles.btnPrimary} onClick={onTransferOwnership}>
@@ -224,8 +201,8 @@ export default function Settings() {
         <Withdrawal
           onClose={() => setWithdrawalModal(false)}
           balance={contractBalance}
-          owner={owner ?? ""}
-          refetchBalance={() => {}} // FIX #6: placeholder since wagmi useBalance removed
+          owner={(contractOwner as string) ?? ""}
+          refetchBalance={() => {}}
         />
       )}
 
