@@ -114,6 +114,7 @@ export default function Settings() {
   // =========================
   console.log("NFT:", process.env.NEXT_PUBLIC_GUILD_NFT_ADDRESS);
   console.log("Board:", process.env.NEXT_PUBLIC_GUILDBOARD_ADDRESS);
+  console.log("RPC:", process.env.NEXT_PUBLIC_RPC_URL);
 
   return (
     <>
