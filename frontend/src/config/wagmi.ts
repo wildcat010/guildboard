@@ -9,7 +9,7 @@ export const config = getDefaultConfig({
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
   chains: [sepolia],
   transports: {
-    [sepolia.id]: webSocket(
+    [sepolia.id]: http(
       RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/DEFAULT_KEY",
     ),
   },
