@@ -135,3 +135,34 @@ guildboard/
       hooks/
       contracts/
 ```
+
+## ⚠️ Security & Design Tradeoffs
+
+GuildBoard intentionally adopts a flexible and open interaction model.
+
+### Open Participation Model
+
+- Any guild member can update task status
+- Task assignment can be modified dynamically
+
+### Risks
+
+This design introduces potential risks:
+
+- Assignee reassignment could redirect rewards
+- Task status manipulation could accelerate payouts
+
+### Why this approach?
+
+The goal is to:
+
+- Prioritize collaboration and simplicity
+- Avoid rigid role hierarchies
+- Demonstrate how decentralized coordination can work with minimal restrictions
+
+### How it could be improved (production scenario)
+
+- Enforce role-based permissions (admin / reviewer / member)
+- Lock assignee after assignment
+- Restrict status transitions per role
+- Introduce pull-based payment model

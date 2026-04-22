@@ -92,7 +92,7 @@ export default function Settings() {
         </div>
         <div className={styles.pageSub}>
           Owner
-          <p className={styles.text}>{owner ?? "N/A"}</p>
+          <p className={styles.text}>{owner}</p>
         </div>
         <div className={styles.container}>
           <div className={styles.pageSub}>
