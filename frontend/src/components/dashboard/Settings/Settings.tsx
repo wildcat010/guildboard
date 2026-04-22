@@ -17,7 +17,8 @@ import { TransferOwnership } from "./transferOwnership/transferOwnership";
 
 export default function Settings() {
   const { data: balance, refetch: refetchBalance } = useBalance({
-    address: GUILDBOARD_ADDRESS,
+    address: GUILDBOARD_ADDRESS as `0x${string}`,
+    query: { enabled: true },
   });
 
   const { address } = useAccount();
