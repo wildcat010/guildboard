@@ -63,7 +63,6 @@ export default function Settings() {
   };
 
   const onTransferOwnership = () => {
-    console.log(1);
     if (isOwner) {
       setTransferOwnershipModal(true);
     } else {
@@ -80,6 +79,9 @@ export default function Settings() {
       refetchIsPaused();
     }
   }, [isEnableShutdownConfirmed, isDisableShutdownConfirmed]);
+
+  console.log("NFT:", process.env.NEXT_PUBLIC_GUILD_NFT_ADDRESS);
+  console.log("Board:", process.env.NEXT_PUBLIC_GUILDBOARD_ADDRESS);
 
   return (
     <>

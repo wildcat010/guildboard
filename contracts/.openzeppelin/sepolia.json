@@ -55,6 +55,21 @@
       "address": "0xf12ad5bCa91DC8C8383a8a0385A07eB93776BF71",
       "txHash": "0x059245d759be610162360245948715f5a5fed4ccfeee907afafd8cbcb7daed70",
       "kind": "uups"
+    },
+    {
+      "address": "0x3559EbcfD963Bd2BD1114830D7D7E8bDE86f2297",
+      "txHash": "0xb4d7f0107c3f127f84c3fe0e493955eb2effcabbfb5d76c47ab752bc5a50142e",
+      "kind": "uups"
+    },
+    {
+      "address": "0x49bfcc327b59afcD03fE8B436E02500268120B49",
+      "txHash": "0x6247d89219aa762d0ec8c4952b100889b02f26434437ce90702f8215048c1474",
+      "kind": "uups"
+    },
+    {
+      "address": "0x012D047F93d75D988F904241F6BfFAC10b8a1F6E",
+      "txHash": "0x48c04f839018220fd26b3bced9250ce96cf0ea6b17d7d5b342781f95e0e54aa6",
+      "kind": "uups"
     }
   ],
   "impls": {
@@ -2775,6 +2790,282 @@
               "label": "_owner",
               "type": "t_address",
               "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:24",
+              "offset": 0,
+              "slot": "0"
+            }
+          ],
+          "erc7201:openzeppelin.storage.Initializable": [
+            {
+              "contract": "Initializable",
+              "label": "_initialized",
+              "type": "t_uint64",
+              "src": "@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol:69",
+              "offset": 0,
+              "slot": "0"
+            },
+            {
+              "contract": "Initializable",
+              "label": "_initializing",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts\\proxy\\utils\\Initializable.sol:73",
+              "offset": 8,
+              "slot": "0"
+            }
+          ]
+        }
+      }
+    },
+    "4a3736715bc25dbefb9911736ce429669151774f00b7fa1d9019de2a6bec6831": {
+      "address": "0xA946Bc975D5EcD3751ee3D731e8dfA02d479F786",
+      "txHash": "0x39c7bb5052d9e1e08de2ec96a90a3a52f82567f7803bc23a73341f06da30a6e9",
+      "layout": {
+        "solcVersion": "0.8.28",
+        "storage": [
+          {
+            "label": "_guildTasks",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:60"
+          },
+          {
+            "label": "_guildPayements",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:61"
+          },
+          {
+            "label": "deposits",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_uint256,t_struct(Depo)9711_storage)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:62"
+          },
+          {
+            "label": "_TaskIDs",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_mapping(t_uint256,t_struct(Task)9702_storage)",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:63"
+          },
+          {
+            "label": "tasksCreated",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_uint256",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:65"
+          },
+          {
+            "label": "totalDeposited",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_uint256",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:66"
+          },
+          {
+            "label": "guildNFT",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_contract(IGuildNFT)9668",
+            "contract": "Guildboard",
+            "src": "contracts\\Guilbboard.sol:71"
+          }
+        ],
+        "types": {
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_struct(InitializableStorage)692_storage": {
+            "label": "struct Initializable.InitializableStorage",
+            "members": [
+              {
+                "label": "_initialized",
+                "type": "t_uint64",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_initializing",
+                "type": "t_bool",
+                "offset": 8,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_struct(PausableStorage)450_storage": {
+            "label": "struct PausableUpgradeable.PausableStorage",
+            "members": [
+              {
+                "label": "_paused",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "32"
+          },
+          "t_uint64": {
+            "label": "uint64",
+            "numberOfBytes": "8"
+          },
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IGuildNFT)9668": {
+            "label": "contract IGuildNFT",
+            "numberOfBytes": "20"
+          },
+          "t_enum(TaskStatus)9682": {
+            "label": "enum Guildboard.TaskStatus",
+            "members": [
+              "toDo",
+              "inProgress",
+              "Done",
+              "Verified",
+              "Close"
+            ],
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_uint256,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(uint256 => uint256[])",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Depo)9711_storage)": {
+            "label": "mapping(uint256 => struct Guildboard.Depo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_struct(Task)9702_storage)": {
+            "label": "mapping(uint256 => struct Guildboard.Task)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Depo)9711_storage": {
+            "label": "struct Guildboard.Depo",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "date",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              }
+            ],
+            "numberOfBytes": "128"
+          },
+          "t_struct(Task)9702_storage": {
+            "label": "struct Guildboard.Task",
+            "members": [
+              {
+                "label": "id",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "description",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "status",
+                "type": "t_enum(TaskStatus)9682",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "poster",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "3"
+              },
+              {
+                "label": "assignee",
+                "type": "t_address_payable",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "guildId",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "reward",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "6"
+              },
+              {
+                "label": "paid",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "7"
+              }
+            ],
+            "numberOfBytes": "256"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        },
+        "namespaces": {
+          "erc7201:openzeppelin.storage.Pausable": [
+            {
+              "contract": "PausableUpgradeable",
+              "label": "_paused",
+              "type": "t_bool",
+              "src": "@openzeppelin\\contracts-upgradeable\\utils\\PausableUpgradeable.sol:21",
               "offset": 0,
               "slot": "0"
             }
