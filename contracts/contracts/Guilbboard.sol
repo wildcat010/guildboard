@@ -201,9 +201,9 @@ ReentrancyGuardTransient {
 // In production, stricter role-based access control is required.
     function updateTaskStatus(uint256 taskId, TaskStatus newStatus, address payable assignee) external taskExists(taskId) whenNotPaused
     {
-        require(guildNFT.isMember(msg.sender), "Not member");
+      
         Task storage myTask = _TaskIDs[taskId];
-        require(guildNFT.isMemberOfGuild(msg.sender, myTask.guildId), "Not in guild");
+     
      
         myTask.status = newStatus;
         myTask.assignee = assignee; 
