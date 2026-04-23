@@ -10,6 +10,7 @@ import { useGuildById } from "@/hooks/useGuildById";
 import "simple-table-core/styles.css";
 import "./CustomTheme.css";
 import MemberModal from "../../memberModal/memberModal";
+import { useGuild } from "@/hooks/useGuild";
 
 const headers = [
   { accessor: "id", label: "ID", width: 60 },
@@ -26,6 +27,7 @@ function GuildName({ guildId }: { guildId: number }) {
 }
 
 export default function MembersTable() {
+  const { isOwner } = useGuild();
   const { getAllMembers, refetchMember, refetchAllMember } = useMember();
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
@@ -65,7 +67,7 @@ export default function MembersTable() {
           refetchAllMember={refetchAllMember}
           onClose={() => setSelectedMember(null)}
           onDeleteSuccess={() => handleDeleteSuccess(Number(selectedMember.id))}
-          isOwner={false}
+          isOwner={isOwner}
         />
       )}
       <SimpleTable

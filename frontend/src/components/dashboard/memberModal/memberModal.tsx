@@ -67,6 +67,7 @@ export default function MemberModal({
 
   // ── Actions ──
   function handleUpgrade() {
+    console.log("is owner", isOwner);
     if (isOwner) {
       pendingUpgrade.current = true;
       upgradeMember(Number(memberState.id), selectedRole);
